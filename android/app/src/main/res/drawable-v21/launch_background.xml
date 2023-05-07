@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Modify this file to customize your launch splash screen -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/gradient_background"
+
+        />
+
+    <!-- You can insert your own image assets here -->
+    <item
+        android:width="300dp"
+        android:height="80dp"
+        android:gravity="center">
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/logo_white" />
+    </item>
+
+    <item
+        android:width="90dp"
+        android:height="40dp"
+        android:bottom="50dp"
+        android:gravity="bottom|center">
+        <bitmap
+            android:gravity="fill"
+            android:tint="#3C6069"
+            android:src="@drawable/poweredby" />
+    </item>
+
+</layer-list>

@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "1096223098682",
+    "project_id": "monsalon-dz",
+    "storage_bucket": "monsalon-dz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096223098682:android:4d0c8e6764ba75ee61f203",
+        "android_client_info": {
+          "package_name": "com.example.monsalon_pro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096223098682-0nimiko429jrf2lliih25i2l4knull7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCESr0hQ1ZmV5eqEMdcHWDgDMLQVsehlI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096223098682-0nimiko429jrf2lliih25i2l4knull7s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096223098682:android:2cc176539c09af0e61f203",
+        "android_client_info": {
+          "package_name": "com.example.monsalondz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096223098682-herhl3ma8r7fpo20soe25a7ks4u1m0l3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.monsalondz",
+            "certificate_hash": "0a79822db0d09f416c9efad1c26fc8d115438278"
+          }
+        },
+        {
+          "client_id": "1096223098682-0nimiko429jrf2lliih25i2l4knull7s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCESr0hQ1ZmV5eqEMdcHWDgDMLQVsehlI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096223098682-0nimiko429jrf2lliih25i2l4knull7s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

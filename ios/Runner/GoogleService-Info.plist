@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1096223098682-9babqjnrhnqmfpehcml41svvf59f9i5r.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1096223098682-9babqjnrhnqmfpehcml41svvf59f9i5r</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1096223098682-herhl3ma8r7fpo20soe25a7ks4u1m0l3.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBjSqSW4vUBK3mDfOxbP33ypbnlucRaMhU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1096223098682</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.monsalonPro</string>
+	<key>PROJECT_ID</key>
+	<string>monsalon-dz</string>
+	<key>STORAGE_BUCKET</key>
+	<string>monsalon-dz.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1096223098682:ios:0bdab8c30039451361f203</string>
+</dict>
+</plist>
