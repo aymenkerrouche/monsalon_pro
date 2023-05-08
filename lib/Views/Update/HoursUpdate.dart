@@ -61,7 +61,6 @@ class _UpdateHoursBodyState extends State<UpdateHoursBody> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Consumer<AuthProvider>(
         builder: (context, auth, child) {
           if(auth.mySalon.hours == null || done == false) {
@@ -96,7 +95,7 @@ class _UpdateHoursBodyState extends State<UpdateHoursBody> {
                     final snackBar = SnackBar(
                       elevation: 10,
                       padding: const EdgeInsets.only(left: 10),
-                      backgroundColor: primary,
+                      backgroundColor: primaryLite2,
                       behavior: SnackBarBehavior.floating,
                       content: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

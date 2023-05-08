@@ -2,16 +2,13 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:monsalon_pro/Theme/colors.dart';
 import 'package:monsalon_pro/Widgets/SnaKeBar.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-
 import '../../Provider/AuthProvider.dart';
 import '../../models/Team.dart';
-
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
@@ -148,31 +145,40 @@ class _QRViewExampleState extends State<QRViewExample> {
   }
   
   Future<void> checkExpertExist() async {
-    FirebaseFirestore.instance.collection("user").doc(result?.code).get().then((exp) async {
-      if(exp.exists){
-        Team newTeam = Team.fromJson({
-          "salonID":FirebaseAuth.instance.currentUser?.uid,
-          "name": exp.data()!["name"] ?? '',
-          "userID": result?.code,
-          "accept": true,
-          "create": true,
-          "active": true
-        });
-        try{
-          await Provider.of<AuthProvider>(context,listen: false).ajouterExperts(newTeam).then((value) => Navigator.pop(context));
+    final provider = Provider.of<AuthProvider>(context,listen: false);
+    if(provider.mySalon.teams.where((element) => element.userID == result?.code).isEmpty){
+      FirebaseFirestore.instance.collection("users").doc(result?.code).get().then((exp) async {
+        if(exp.exists){
+          Team newTeam = Team.fromJson({
+            "salonID":FirebaseAuth.instance.currentUser?.uid,
+            "name": exp.data()!["name"] ?? '',
+            "userID": result?.code,
+            "accept": true,
+            "create": true,
+            "active": true
+          });
+
+          try{
+            await Provider.of<AuthProvider>(context,listen: false).ajouterExperts(newTeam).then((value) => Navigator.pop(context));
+          }
+          catch(e){
+            final snackBar = snaKeBar(e.toString(),);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            setState(() {adding = false;});
+          }
         }
-        catch(e){
-          final snackBar = snaKeBar(e.toString(),);
+        else{
+          final snackBar = snaKeBar("Utilisateur non trouvé");
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          setState(() {adding = false;});
         }
-      }
-      else{
-        final snackBar = snaKeBar("Utilisateur non trouvé");
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }
-      setState(() {adding = false;});
-    });
+        setState(() {adding = false;});
+      });
+    }
+    else{
+      final snackBar = snaKeBar("L'expert existe déjà");
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
   }
 
   @override

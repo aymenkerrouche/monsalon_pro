@@ -11,7 +11,7 @@ Widget buildPhoneNumberFormField(phoneController,label, hint) {
       keyboardType: TextInputType.phone,
       controller: phoneController,
       cursorColor: primary,
-      style: const TextStyle(fontWeight: FontWeight.w700),
+      style: const TextStyle(fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -31,7 +31,7 @@ Widget buildPhoneNumberFormField(phoneController,label, hint) {
             borderSide: BorderSide(color: clr3.withOpacity(.5), width: 1.5),
             gapPadding: 6),
         contentPadding:
-        const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
       ),
     ),
   );
@@ -39,13 +39,14 @@ Widget buildPhoneNumberFormField(phoneController,label, hint) {
 
 
 class TextInfomation extends StatelessWidget {
-  TextInfomation({Key? key, required this.textController, this.hint, this.label, this.icon, this.textType = TextInputType.number, this.readOnly = false}) : super(key: key);
+  TextInfomation({Key? key, required this.textController, this.hint, this.label,this.icon, this.textType = TextInputType.number, this.readOnly = false, this.maxLine= 1}) : super(key: key);
   TextEditingController textController;
   String? label ;
   String? hint ;
   IconData? icon;
   TextInputType? textType;
   bool readOnly;
+  int maxLine;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -54,8 +55,10 @@ class TextInfomation extends StatelessWidget {
         keyboardType: textType,
         controller: textController,
         cursorColor: primary,
+        textCapitalization: TextCapitalization.sentences,
         readOnly: readOnly,
-        style: const TextStyle(fontWeight: FontWeight.w700),
+        maxLines: maxLine,
+        style: const TextStyle(fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
@@ -74,8 +77,7 @@ class TextInfomation extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: clr3.withOpacity(.5), width: 1.5),
               gapPadding: 6),
-          contentPadding:
-          const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 18),
         ),
       ),
     );

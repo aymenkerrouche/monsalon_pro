@@ -46,7 +46,7 @@ class _WilayaState extends State<Wilaya> {
                 color: Colors.black87,
                 fontFamily: 'Rubik',
                 fontWeight: FontWeight.w600),
-            fieldSuffixIcon: Icon(Icons.arrow_drop_down_circle_outlined,color: primary,size: 20,),
+            fieldSuffixIcon: const Icon(Icons.arrow_drop_down_circle_outlined,color: primary,size: 20,),
             onChanged: (v){Provider.of<AuthProvider>(context,listen: false).clearLaCommune();},
           ),
         ),

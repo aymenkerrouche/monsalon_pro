@@ -17,7 +17,7 @@ class ChooseCategories extends StatelessWidget {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        title: const FittedBox(child: Text("Choisissez vos catégories",style: TextStyle(fontWeight: FontWeight.w700,color: Colors.white),)),
+        title: const FittedBox(child: Text("Choisissez vos catégories",style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),)),
         centerTitle: true,
         backgroundColor: primary,
         elevation: 0,

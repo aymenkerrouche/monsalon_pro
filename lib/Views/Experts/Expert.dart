@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../Provider/AuthProvider.dart';
 import '../../Theme/colors.dart';
+import '../../Widgets/SnaKeBar.dart';
 import '../../Widgets/keyboard.dart';
 import '../../models/Team.dart';
 import 'ScanQrExpert.dart';
@@ -225,7 +226,6 @@ class _AddExpertState extends State<AddExpert> {
                 ),
               ),
               const Text( "Ajouter un Expert", style: TextStyle(fontSize: 18, color: Colors.black,fontWeight: FontWeight.w600),textAlign: TextAlign.center,),
-
               const SizedBox(height: 20,),
               TextInfomation(textController: expertName,hint:"Entrez le nom de l'expert",label: "Expert",icon: CupertinoIcons.person_alt_circle,textType: TextInputType.text,),
 
@@ -256,7 +256,7 @@ class _AddExpertState extends State<AddExpert> {
                 trailing: CupertinoSwitch(value: create, activeColor: primaryLite2, onChanged: (value){setState(() {create=value;});},),
               ),
 
-              const SizedBox(height: 20,),
+              const SizedBox(height: 10,),
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 5),
                 title: const Text("Peut accepter des RDVs",style: TextStyle(fontWeight: FontWeight.w600),),
@@ -273,6 +273,8 @@ class _AddExpertState extends State<AddExpert> {
                     fixedSize: Size(size.width, 48)
                 ),
                 onPressed: () async {
+                  KeyboardUtil.hideKeyboard(context);
+                  final provider = Provider.of<AuthProvider>(context,listen: false);
                   if(expertName.text.isEmpty  && id == true ){
                     const snackBar = SnackBar(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
@@ -296,28 +298,33 @@ class _AddExpertState extends State<AddExpert> {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                   else{
-                    KeyboardUtil.hideKeyboard(context);
-                    Team newTeam = Team.fromJson({
-                      "salonID":FirebaseAuth.instance.currentUser?.uid,
-                      "name": expertName.text,
-                      "userID": !id ? expertID.text : '',
-                      "accept": accept,
-                      "create": create,
-                      "active": true
-                    });
-                    try{
-                      await Provider.of<AuthProvider>(context,listen: false).ajouterExperts(newTeam).then((value) => Navigator.pop(context));
-                    }
-                    catch(e){
-                      final snackBar = SnackBar(
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          e.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
+                    if(provider.mySalon.teams.where((element) => element.userID == expertID.text).isEmpty){
+                      Team newTeam = Team.fromJson({
+                        "salonID":FirebaseAuth.instance.currentUser?.uid,
+                        "name": expertName.text,
+                        "userID": !id ? expertID.text : '',
+                        "accept": accept,
+                        "create": create,
+                        "active": true
+                      });
+                      try{
+                        await Provider.of<AuthProvider>(context,listen: false).ajouterExperts(newTeam).then((value) => Navigator.pop(context));
+                      }
+                      catch(e){
+                        final snackBar = SnackBar(
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+                          behavior: SnackBarBehavior.floating,
+                          content: Text(
+                            e.toString(),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        );
 
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    }
+                    else{
+                      final snackBar = snaKeBar("L'expert existe déjà");
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                   }
@@ -361,117 +368,93 @@ class _ModifierExpertState extends State<ModifierExpert> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return SizedBox(
-      height: size.height * 0.6,
+      height: size.height * 0.5,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 4,
-                width: 34,
-                margin: const EdgeInsets.only(top: 5,bottom: 20),
-                decoration:  const BoxDecoration(
-                  color: primaryPro,
-                  borderRadius: BorderRadius.all(Radius.circular(50)),
-                ),
+        body: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 4,
+              width: 34,
+              margin: const EdgeInsets.only(top: 5,bottom: 20),
+              decoration:  const BoxDecoration(
+                color: primaryPro,
+                borderRadius: BorderRadius.all(Radius.circular(50)),
               ),
-              const Text( "Modifier l'Expert", style: TextStyle(fontSize: 18, color: Colors.black,fontWeight: FontWeight.w600),textAlign: TextAlign.center,),
+            ),
+            //const Text( "Modifier l'Expert", style: TextStyle(fontSize: 18, color: Colors.black,fontWeight: FontWeight.w600),textAlign: TextAlign.center,),
 
-              const SizedBox(height: 15,),
-              TextInfomation(textController: expertName,hint:expertName.text,label: "Expert",icon: CupertinoIcons.person_alt_circle,textType: TextInputType.text,),
+            const Spacer(),
+            TextInfomation(textController: expertName,hint:expertName.text,label: "Expert",icon: CupertinoIcons.person,textType: TextInputType.text,),
 
-              const SizedBox(height: 20,),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                title: const Text("Peut créer des RDVs",style: TextStyle(fontWeight: FontWeight.w600),),
-                trailing: CupertinoSwitch(value: widget.expert.create!, activeColor: primaryLite2, onChanged: (value){setState(() {widget.expert.create = value;});},),
+            const SizedBox(height: 20,),
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+              title: const Text("Peut créer des RDVs",style: TextStyle(fontWeight: FontWeight.w600),),
+              trailing: CupertinoSwitch(value: widget.expert.create!, activeColor: primaryLite2, onChanged: (value){setState(() {widget.expert.create = value;});},),
+            ),
+
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+              title: const Text("Peut accepter des RDVs",style: TextStyle(fontWeight: FontWeight.w600),),
+              trailing: CupertinoSwitch(value: widget.expert.accept!, activeColor: primaryLite2, onChanged: (value){setState(() {widget.expert.accept=value;});},),
+            ),
+
+            const Spacer(),
+            OutlinedButton(
+              onPressed: () async {
+                KeyboardUtil.hideKeyboard(context);
+                try{
+                  await Provider.of<AuthProvider>(context,listen: false).deleteExpert(widget.expert.id).then((value) => Navigator.pop(context));
+                }
+                catch(e){
+                  final snackBar = snaKeBar(e.toString(),);
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+              },
+              style: OutlinedButton.styleFrom(
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+                side: BorderSide(color: Colors.red.shade800, width: 1),
+                foregroundColor: Colors.red.shade800,
+                fixedSize: Size(size.width, 48),
               ),
-
-              const SizedBox(height: 20,),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                title: const Text("Peut accepter des RDVs",style: TextStyle(fontWeight: FontWeight.w600),),
-                trailing: CupertinoSwitch(value: widget.expert.accept!, activeColor: primaryLite2, onChanged: (value){setState(() {widget.expert.accept=value;});},),
+              child: Text("Supprimer" , style: TextStyle(color: Colors.red.shade800,fontWeight: FontWeight.w600,fontSize: 20),),
+            ),
+            const SizedBox(height: 20,),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  backgroundColor: primaryLite2,
+                  foregroundColor: Colors.white,
+                  fixedSize: Size(size.width, 48)
               ),
+              onPressed: () async {
 
-              const SizedBox(height: 30,),
-              OutlinedButton(
-                onPressed: () async {
+                if(expertName.text.isEmpty){
+                  final snackBar = snaKeBar("Ajouter le nom de l'Expert",);
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+                else{
+                  setState(() {widget.expert.name = expertName.text;});
                   KeyboardUtil.hideKeyboard(context);
                   try{
-                    await Provider.of<AuthProvider>(context,listen: false).deleteExpert(widget.expert.id).then((value) => Navigator.pop(context));
+                    await Provider.of<AuthProvider>(context,listen: false).updateExpert(widget.expert).then((value) => Navigator.pop(context));
                   }
                   catch(e){
-                    final snackBar = SnackBar(
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        e.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    );
+                    final snackBar = snaKeBar("Ajouter le nom de l'Expert",);
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
-                },
-                style: OutlinedButton.styleFrom(
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                  side: BorderSide(color: Colors.red.shade800, width: 1),
-                  foregroundColor: Colors.red.shade800,
-                  fixedSize: Size(size.width, 48),
-                ),
-                child: Text("Supprimer" , style: TextStyle(color: Colors.red.shade800,fontWeight: FontWeight.w600,fontSize: 20),),
+                }
+              },
+              child:
+              const Text( "Sauvegarder",
+                style: TextStyle(fontSize: 20, color: Colors.white,fontWeight: FontWeight.w700),
               ),
-              const SizedBox(height: 20,),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    backgroundColor: primaryLite2,
-                    foregroundColor: Colors.white,
-                    fixedSize: Size(size.width, 48)
-                ),
-                onPressed: () async {
-
-                  if(expertName.text.isEmpty){
-                    const snackBar = SnackBar(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        "Ajouter le nom de l'Expert",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }
-                  else{
-                    setState(() {widget.expert.name = expertName.text;});
-                    KeyboardUtil.hideKeyboard(context);
-                    try{
-                      await Provider.of<AuthProvider>(context,listen: false).updateExpert(widget.expert).then((value) => Navigator.pop(context));
-                    }
-                    catch(e){
-                      final snackBar = SnackBar(
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          e.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                  }
-                },
-                child:
-                const Text( "Sauvegarder",
-                  style: TextStyle(fontSize: 20, color: Colors.white,fontWeight: FontWeight.w700),
-                ),
-              ),
-              const SizedBox(height: 20,),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20,),
+          ],
         ),
       ),
     );

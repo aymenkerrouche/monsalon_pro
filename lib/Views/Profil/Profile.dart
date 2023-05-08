@@ -9,6 +9,7 @@ import 'package:monsalon_pro/Views/Update/PhotosUpdate.dart';
 import 'package:provider/provider.dart';
 import '../../Provider/AuthProvider.dart';
 import '../../Widgets/profile_menu.dart';
+import '../Auth/Maps.dart';
 import '../Auth/authOTP.dart';
 import '../Update/Informations.dart';
 import '../Update/ServicesUpdate.dart';
@@ -65,7 +66,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               ProfileMenu(
-                text: "Profile",
+                text: "Profil",
                 icon: "assets/icons/user1.svg",
                 press: () => Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => const UpdateInformation()),)),
                 primary: primary,
@@ -97,6 +98,13 @@ class _ProfileState extends State<Profile> {
                 text: "Experts",
                 icon: "assets/icons/staff.svg",
                 press: ()=> Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => const ExpertScreen()),)),
+                primary: primary,
+                secondary: clr3,
+              ),
+              ProfileMenu(
+                text: "Position GPS",
+                icon: "assets/icons/location.svg",
+                press: ()=> Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => MapScreen(isUpdate: true,)),)),
                 primary: primary,
                 secondary: clr3,
               ),

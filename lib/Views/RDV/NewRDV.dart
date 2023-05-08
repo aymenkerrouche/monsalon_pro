@@ -169,7 +169,7 @@ class _CreateRdvBodyState extends State<CreateRdvBody> {
 
           if(provider.mySalon.teams.isNotEmpty) teamList(teamController,provider.mySalon.teams),
 
-          if(provider.mySalon.teams.isNotEmpty) const SizedBox(height: 50,),
+          if(provider.mySalon.teams.isNotEmpty) const SizedBox(height: 30,),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),

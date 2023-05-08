@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:monsalon_pro/models/MoneyModel.dart';
+import '../Widgets/SnaKeBar.dart';
 import '../models/Statistics.dart';
 
 
@@ -28,15 +29,7 @@ class StatisticsProvider extends ChangeNotifier {
     .catchError((onError){
       debugPrint(onError.toString());
       done = true;
-      final snackBar = SnackBar(
-        elevation: 10,
-        backgroundColor: Colors.red.shade700,
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          onError.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(onError.toString(),);
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       notifyListeners();
     });
@@ -48,23 +41,16 @@ class StatisticsProvider extends ChangeNotifier {
     currentMonth = 0;
     done = false;
     try{
-      await FirebaseFirestore.instance.collection("statistics").doc("ZAoUYwsrjqpVXCDbqqRM"/*FirebaseAuth.instance.currentUser?.uid*/).get().then((snapshot){
+      await FirebaseFirestore.instance.collection("statistics").doc(FirebaseAuth.instance.currentUser?.uid).get().then((snapshot){
         if(snapshot.exists){
           ceMoisMoney = Money.fromJson(snapshot.data()!);
         }
-      }).then((value) async => await getCommissions());
+      });
     }
     catch(onError){
       debugPrint(onError.toString());
       done = true;
-      final snackBar = SnackBar(
-        elevation: 10,
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          onError.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(onError.toString(),);
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       notifyListeners();
     }
@@ -84,7 +70,7 @@ class StatisticsProvider extends ChangeNotifier {
 
     Timer(const Duration(seconds: 1), () async {
       try{
-        await FirebaseFirestore.instance.collection("statistics").doc("ZAoUYwsrjqpVXCDbqqRM"/*FirebaseAuth.instance.currentUser?.uid*/).get().then((snapshot){
+        await FirebaseFirestore.instance.collection("statistics").doc(FirebaseAuth.instance.currentUser?.uid).get().then((snapshot){
           if(snapshot.exists){
             ceMoisMoney = Money.fromJson(snapshot.data()!);
             try{
@@ -115,24 +101,12 @@ class StatisticsProvider extends ChangeNotifier {
               ceMoisMoney.etatCeMois = 0 ;
             }
           }
-        }).then((value) async {
-          if(todayMonth == DateTime.now().month && todayYear == DateTime.now().year){
-            await getCommissions();
-          }
         });
       }
       catch(onError){
         debugPrint(onError.toString());
         done = true;
-        final snackBar = SnackBar(
-          elevation: 10,
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-            onError.toString(),
-            style: const TextStyle(color: Colors.white),
-          ),
-        );
+        final snackBar = snaKeBar(onError.toString(),);
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         notifyListeners();
       }
@@ -149,23 +123,4 @@ class StatisticsProvider extends ChangeNotifier {
     currentMonth--;
     notifyListeners();
   }
-
-
-  Future<void> getCommissions() async {
-    try{
-      await FirebaseFirestore.instance.collection("commission").doc("commission").get().then((snapshot){
-        if(snapshot.exists){
-          ceMoisMoney.fraisDeService = snapshot.data()!["fraisDeService"] ?? 0 ;
-          ceMoisMoney.commission = snapshot.data()!["commission"] ?? 0 ;
-          ceMoisMoney.commissionTotal = (ceMoisMoney.prixCeMois! * (ceMoisMoney.commission!/100)) + (ceMoisMoney.fraisDeService! * ceMoisMoney.rdv!) ;
-        }
-      });
-    }
-    catch(onError){
-      debugPrint(onError.toString());
-    }
-    notifyListeners();
-  }
-
-
 }

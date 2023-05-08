@@ -1,5 +1,10 @@
+import 'package:badges/badges.dart' as badge;
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
+import '../Provider/AuthProvider.dart';
 
 class ProfileMenu extends StatelessWidget {
   const ProfileMenu({
@@ -32,29 +37,34 @@ class ProfileMenu extends StatelessWidget {
             blurRadius: 1,
           )
         ]),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: primary,
-          padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 18),
-          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          backgroundColor: Colors.white,
-          shadowColor: Colors.black12,
-          elevation: 20,
-        ),
-        onPressed: press,
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              icon,
-              color: primary,
-              width: width,
-              height: 22,
+      child: Stack(
+        children: [
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: primary,
+              padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 18),
+              shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              backgroundColor: Colors.white,
+              shadowColor: Colors.black12,
+              elevation: 20,
             ),
-            const SizedBox(width: 20),
-            Expanded(child: Text(text,style: const TextStyle(fontSize: 18),)),
-            bye ? SizedBox(height: 25,width: 25,child: CircularProgressIndicator(color: primary,strokeWidth: 3,)) :const Icon(Icons.arrow_forward_ios),
-          ],
-        ),
+            onPressed: press,
+            child: Row(
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  color: primary,
+                  width: width,
+                  height: 22,
+                ),
+                const SizedBox(width: 20),
+                Expanded(child: Text(text,style: const TextStyle(fontSize: 18),)),
+                bye ? SizedBox(height: 25,width: 25,child: CircularProgressIndicator(color: primary,strokeWidth: 3,)) :const Icon(Icons.arrow_forward_ios),
+              ],
+            ),
+          ),
+          if(Provider.of<AuthProvider>(context,listen: false).mySalon.pack == 1 && text == "Experts")const Positioned(top: 8,right: 8,child: badge.Badge(badgeStyle: BadgeStyle(badgeColor: Colors.pink,padding: EdgeInsets.all(3))))
+        ]
       ),
     );
   }

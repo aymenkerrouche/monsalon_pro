@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.monsalon_pro">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
     <queries>
         <intent>
@@ -47,8 +50,10 @@
         </activity>
        <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
            android:resource="@mipmap/ic_firebase_notification" />
-        <meta-data
+       <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyBGAMgS8I3HjEE9i_x8lfPIJc98UudVIys"/>
     </application>
 </manifest>

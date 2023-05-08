@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:monsalon_pro/Provider/AuthProvider.dart';
+import 'package:monsalon_pro/Widgets/SnaKeBar.dart';
 import 'package:provider/provider.dart';
 import '../../Widgets/Wilaya.dart';
 import '../../Widgets/keyboard.dart';
@@ -90,43 +91,44 @@ class _UpdateInformationBodyState extends State<UpdateInformationBody> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20,),
-              Text("Informations du salon",
+              const Text("Informations du salon",
                 style: TextStyle(color: primaryPro,
                     fontWeight: FontWeight.w700,
-                    fontSize: 24,
+                    fontSize: 20,
                     letterSpacing: 1), maxLines: 3,),
-              const SizedBox(height: 30,),
+              const SizedBox(height: 20,),
 
               TextInfomation(textController: salonNameController,
-                label: "Nom de l'établissement",
+                label: "Nom",
                 hint: "${provider.mySalon.nom}",
                 icon: Icons.business_sharp,),
-              const SizedBox(height: 30,),
-
-              TextInfomation(textController: salonDescController,
-                label: "Bio",
-                hint: "${provider.mySalon.description}",
-                icon: Icons.description_outlined,),
               const SizedBox(height: 30,),
 
               if(FirebaseAuth.instance.currentUser?.phoneNumber == null)buildPhoneNumberFormField(salonPhoneController, "phone", "${provider.mySalon.phone}"),
               if(FirebaseAuth.instance.currentUser?.phoneNumber == null)const SizedBox(height: 30,),
 
-              Text(
+              TextInfomation(textController: salonDescController,
+                label: "Bio",
+                hint: "${provider.mySalon.description}",
+                icon: Icons.description_outlined,maxLine: 3,),
+              const SizedBox(height: 30,),
+
+
+              const Text(
                   "Wilaya",
                   style: TextStyle(color: primaryPro,
                       fontWeight: FontWeight.w700,
-                      fontSize: 24,
+                      fontSize: 20,
                       letterSpacing: 1)),
               const SizedBox(height: 20,),
               const Wilaya(),
               const SizedBox(height: 30,),
 
-              Text(
+              const Text(
                   "Sexe",
                   style: TextStyle(color: primaryPro,
                       fontWeight: FontWeight.w700,
-                      fontSize: 24,
+                      fontSize: 20,
                       letterSpacing: 1)),
               const SizedBox(height: 10,),
               Row(
@@ -152,7 +154,7 @@ class _UpdateInformationBodyState extends State<UpdateInformationBody> {
                       final snackBar = SnackBar(
                         elevation: 10,
                         padding: const EdgeInsets.only(left: 10),
-                        backgroundColor: primary,
+                        backgroundColor: primaryLite2,
                         behavior: SnackBarBehavior.floating,
                         content: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -169,28 +171,12 @@ class _UpdateInformationBodyState extends State<UpdateInformationBody> {
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       Navigator.pop(context);})
                     .catchError((onError){
-                      final snackBar = SnackBar(
-                        elevation: 10,
-                        backgroundColor: Colors.red.shade700,
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          onError.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
+                      final snackBar = snaKeBar(onError.toString());
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     });
                   }
                   else {
-                    final snackBar = SnackBar(
-                      elevation: 10,
-                      backgroundColor: Colors.red.shade700,
-                      behavior: SnackBarBehavior.floating,
-                      content: const Text(
-                        "Remplissez les informations de votre salon",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
+                    final snackBar = snaKeBar("Remplissez les informations de votre salon",);
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                   setState(() {next = false;});

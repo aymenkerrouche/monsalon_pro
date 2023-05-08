@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,13 +12,13 @@ import 'package:monsalon_pro/theme/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../Provider/AuthProvider.dart';
-import '../../Provider/UserProvider.dart';
 import '../../Widgets/SnaKeBar.dart';
 import '../../main.dart';
 import '../../widgets/keyboard.dart';
 import '../../widgets/phone TextField.dart';
 import '../account/UpdateProfileScreen.dart';
-import 'package:monsalon_pro/models/User.dart' as us;
+
+
 
 class AuthOTP extends StatelessWidget {
   const AuthOTP({Key? key}) : super(key: key);
@@ -298,7 +297,7 @@ class _OTPState extends State<OTP> {
                           // SIGN IN
                           else{
                             if(value.user != null){
-                              await FirebaseFirestore.instance.collection("user").doc(value.user?.uid).update({"token":await FirebaseMessaging.instance.getToken()}).then((value){
+                              await FirebaseFirestore.instance.collection("users").doc(value.user?.uid).update({"token":await FirebaseMessaging.instance.getToken()}).then((value){
                                 EasyLoading.dismiss();
                                 Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const HomePage()), (Route<dynamic> route) => false);}
                               );
@@ -393,76 +392,85 @@ class _OTPState extends State<OTP> {
               fixedSize: Size(size.width , 50),
             ),
             onPressed: () {
-              Timer(const Duration(milliseconds: 300), () async {
+              final providerAuth = Provider.of<AuthProvider>(context, listen: false);
+              KeyboardUtil.hideKeyboard(context);
 
-                final providerAuth = Provider.of<AuthProvider>(context, listen: false);
-                KeyboardUtil.hideKeyboard(context);
-                UserCredential? user;
+              Timer(const Duration(milliseconds: 200), () async {
 
                 // AUTH
-                try{EasyLoading.show();user = await providerAuth.signInWithGoogle();}
+                try{
+                  EasyLoading.show();
+                  await providerAuth.signInWithGoogle().then((user) async{
+                    if(user?.user != null){
+                      try{
+
+                        // EXPERT AUTH
+                        if(isExpert == true){
+                          await prefs?.setBool("expertMode", true);
+
+                          await FirebaseFirestore.instance.collection("users").doc(user?.user?.uid).get().then((snapshot) async {
+
+                            // SIGN UP
+                            if(!snapshot.exists){
+                              await FirebaseFirestore.instance.collection("users").doc(user?.user?.uid).set({"nom": user?.user?.displayName, "email": user?.user?.providerData.first.email,"expert":true,"token":await FirebaseMessaging.instance.getToken()}).then((value){
+                                EasyLoading.dismiss();
+                                Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const UpdateProfileScreen(isSignUP: true,)), (Route<dynamic> route) => false);
+                              });
+                            }
+
+                            // SIGN IN
+                            else{
+                              await FirebaseFirestore.instance.collection("users").doc(user?.user?.uid).update({"token":await FirebaseMessaging.instance.getToken()}).then((value){
+                                EasyLoading.dismiss();
+                                Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const HomePage()), (Route<dynamic> route) => false);}
+                              );
+                            }
+
+                          });
+                        }
+
+                        else{
+                          await prefs?.setBool("expertMode", false);
+                          await FirebaseFirestore.instance.collection("salon").doc(user?.user?.uid).get().then((snapshot) async {
+
+                            // SIGN UP
+                            if(!snapshot.exists){
+                              await FirebaseFirestore.instance.collection("salon").doc(user?.user?.uid).set({"nom": user?.user?.displayName, "email": user?.user?.providerData.first.email,"visible":false,"token":await FirebaseMessaging.instance.getToken()}).then((value){
+                                EasyLoading.dismiss();
+                                Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const SignUpScreen()), (Route<dynamic> route) => false);}
+                              );
+                            }
+
+                            // SIGN IN
+                            else{
+                              await FirebaseFirestore.instance.collection("salon").doc(user?.user?.uid).update({"token":await FirebaseMessaging.instance.getToken()}).then((value){
+                                EasyLoading.dismiss();
+                                Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const HomePage()), (Route<dynamic> route) => false);}
+                              );
+                            }
+
+                          })
+                          .catchError((onError){
+                            debugPrint(onError.toString());
+                            final snackBar = snaKeBar(onError.toString());
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            EasyLoading.dismiss();
+                          });
+                        }
+
+                      }
+                      catch(e){
+                        EasyLoading.dismiss();
+                        final snackBar = snaKeBar(e.toString());
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    }
+                  });
+                }
                 catch(onError){
                   EasyLoading.dismiss();
                   final snackBar = snaKeBar("Vérifier votre connexion");
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                }
-
-                if(user?.user != null){
-
-                  // EXPERT AUTH
-                  if(isExpert == true){
-                    await prefs?.setBool("expertMode", true);
-
-                    await FirebaseFirestore.instance.collection("users").doc(user?.user?.uid).get().then((snapshot) async {
-
-                      // SIGN UP
-                      if(!snapshot.exists){
-                        await FirebaseFirestore.instance.collection("users").doc(user?.user?.uid).set({"nom": user?.user?.displayName, "email": user?.user?.providerData.first.email,"expert":true,"token":await FirebaseMessaging.instance.getToken()}).then((value){
-                          EasyLoading.dismiss();
-                          Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const UpdateProfileScreen(isSignUP: true,)), (Route<dynamic> route) => false);
-                        });
-                      }
-
-                      // SIGN IN
-                      else{
-                        await FirebaseFirestore.instance.collection("user").doc(user?.user?.uid).update({"token":await FirebaseMessaging.instance.getToken()}).then((value){
-                          EasyLoading.dismiss();
-                          Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const HomePage()), (Route<dynamic> route) => false);}
-                        );
-                      }
-
-                    });
-                  }
-
-                  else{
-                    await prefs?.setBool("expertMode", false);
-                    await FirebaseFirestore.instance.collection("salon").doc(user?.user?.uid).get().then((snapshot) async {
-
-                      // SIGN UP
-                      if(!snapshot.exists){
-                        await FirebaseFirestore.instance.collection("salon").doc(user?.user?.uid).set({"nom": user?.user?.displayName, "email": user?.user?.providerData.first.email,"visible":false,"token":await FirebaseMessaging.instance.getToken()}).then((value){
-                          EasyLoading.dismiss();
-                          Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const SignUpScreen()), (Route<dynamic> route) => false);}
-                        );
-                      }
-
-                      // SIGN IN
-                      else{
-                        await FirebaseFirestore.instance.collection("salon").doc(user?.user?.uid).update({"token":await FirebaseMessaging.instance.getToken()}).then((value){
-                          EasyLoading.dismiss();
-                          Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const HomePage()), (Route<dynamic> route) => false);}
-                        );
-                      }
-
-                    })
-                    .catchError((onError){
-                      debugPrint(onError.toString());
-                      final snackBar = snaKeBar(onError.toString());
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      EasyLoading.dismiss();
-                    });
-                  }
-
                 }
                 EasyLoading.dismiss();
               });

@@ -2,13 +2,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:monsalon_pro/Provider/AuthProvider.dart';
+import 'package:monsalon_pro/Widgets/SnaKeBar.dart';
 import 'package:provider/provider.dart';
-import '../../Provider/CategoriesProvider.dart';
 import '../../Widgets/Wilaya.dart';
 import '../../Widgets/keyboard.dart';
+import '../../Widgets/phone TextField.dart';
 import '../../theme/colors.dart';
-import '../../widgets/phone TextField.dart';
-import 'ChooseCategories.dart';
+import 'Maps.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -18,10 +18,10 @@ class SignUpScreen extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return GestureDetector(onTap: () {FocusScope.of(context).unfocus();KeyboardUtil.hideKeyboard(context);},
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: background,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text("Inscription",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 24)),
+          title: const Text("Inscription",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,fontSize: 24)),
           backgroundColor: primary,
           centerTitle: true,
         ),
@@ -74,24 +74,23 @@ class _BodySignUpState extends State<BodySignUp> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 10,),
-          const Text("Remplissez les informations de votre salon", style: TextStyle(color: primaryPro,fontWeight: FontWeight.w700,fontSize: 24,letterSpacing: 1),maxLines: 3,),
-
-          const SizedBox(height: 50,),
-
-          TextInfomation(textController: salonNameController,label: "Nom de l'établissement",hint: "salon de beauté",icon: Icons.business_sharp,),
+          const SizedBox(height: 16,),
+          const Text("Remplissez les informations", style: TextStyle(color: primaryPro,fontWeight: FontWeight.w700,fontSize: 20,letterSpacing: 1),maxLines: 3,),
           const SizedBox(height: 30,),
 
-          TextInfomation(textController: salonDescController,label: "Bio",hint: "description",icon: Icons.description_outlined,),
+          TextInfomation(textController: salonNameController,label: "Nom",hint: "Salon de beauté",icon: Icons.business_sharp,textType: TextInputType.text),
           const SizedBox(height: 30,),
 
-          if(FirebaseAuth.instance.currentUser?.phoneNumber == null)buildPhoneNumberFormField(salonPhoneController,"phone","05 xx xx xx"),
+          if(FirebaseAuth.instance.currentUser?.phoneNumber == null)buildPhoneNumberFormField(salonPhoneController,"phone","05 -- -- -- --"),
           if(FirebaseAuth.instance.currentUser?.phoneNumber == null)const SizedBox(height: 30,),
 
-          const Wilaya(),
+          TextInfomation(textController: salonDescController,label: "Bio",hint: "Description",icon: Icons.description_outlined,maxLine:3,textType: TextInputType.text,),
           const SizedBox(height: 30,),
 
-          const Text("Sexe", style: TextStyle(color: primaryPro,fontWeight: FontWeight.w700,fontSize: 24,letterSpacing: 1)),
+          const Wilaya(),
+          const SizedBox(height: 20,),
+
+          const Text("Sexe", style: TextStyle(color: primaryPro,fontWeight: FontWeight.w700,fontSize: 20,letterSpacing: 1)),
           const SizedBox(height: 10,),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -104,67 +103,48 @@ class _BodySignUpState extends State<BodySignUp> {
 
           const SizedBox(height: 30,),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              TextButton(
+                onPressed:() async {
+                  setState(() {
+                    salonNameController.clear();
+                    salonDescController.clear() ;
+                    salonPhoneController.clear() ;
+                    selectGender = '';
+                    Provider.of<AuthProvider>(context,listen: false).clearLaWilaya();
+                  });
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: primaryLite,
+                  padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                  elevation: 20,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)))
+                ),
+                child: const Text("Réinitialiser", style: TextStyle(color: primary ,fontWeight: FontWeight.w700,fontSize: 18,letterSpacing: 1,decoration: TextDecoration.underline,),),
+              ),
+              const Spacer(),
               TextButton(
                 onPressed:() async {
                   setState(() {next = true;});
 
                   final auth = Provider.of<AuthProvider>(context,listen: false);
-                  final provider = Provider.of<CategoriesProvider>(context,listen: false);
 
+                  // NUM TELEPHONE
                   if(FirebaseAuth.instance.currentUser?.phoneNumber != null){
                     salonPhoneController.text = FirebaseAuth.instance.currentUser!.phoneNumber!;
                   }
 
+                  // CREATION SALON
                   if(salonNameController.text.isNotEmpty && salonDescController.text.isNotEmpty && salonPhoneController.text.isNotEmpty && selectGender != '' && auth.laWilaya.text.isNotEmpty && auth.laCommune.text.isNotEmpty){
 
                     auth.fillSalon(salonNameController.text, salonDescController.text, selectGender,salonPhoneController.text);
 
-                    await auth.createSalon();
-
-                    await provider.getCategories()
-                    .then((value) async => await provider.getServices()
-                      .then((v) => Navigator.push(context, MaterialPageRoute(builder: (context) => ChooseCategories()),))
-                      .catchError((err){
-                        setState(() {next = false;});
-                        final snackBar = SnackBar(
-                          elevation: 10,
-                          backgroundColor: Colors.red.shade700,
-                          behavior: SnackBarBehavior.floating,
-                          content: Text(
-                            err.toString(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      })
-                    ).catchError((e){
-                      setState(() {next = false;});
-                      final snackBar = SnackBar(
-                        elevation: 10,
-                        backgroundColor: Colors.red.shade700,
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          e.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    });
-
+                    // MAPS
+                    Provider.of<AuthProvider>(context,listen: false).getMyLocation(context).then((v)=> Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen())));
                   }
+                  // ERROR
                   else{
-                    final snackBar = SnackBar(
-                      elevation: 10,
-                      duration: const Duration(seconds: 3),
-                      backgroundColor: Colors.red.shade700,
-                      behavior: SnackBarBehavior.floating,
-                      content: const Text(
-                        "Remplissez les informations de votre salon",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
+                    final snackBar = snaKeBar("Remplissez les informations de votre salon");
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
 
@@ -189,7 +169,7 @@ class _BodySignUpState extends State<BodySignUp> {
                   ],
                 ),
               ),
-              const SizedBox(width: 10,)
+              const SizedBox(width: 10,),
             ],
           ),
           const SizedBox(height: 20,),
@@ -251,4 +231,5 @@ class _BodySignUpState extends State<BodySignUp> {
     );
   }*/
 }
+
 

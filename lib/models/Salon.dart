@@ -20,6 +20,7 @@ class Salon {
   String? description;
   String? phone;
   Hours? hours;
+  int? pack;
   List<String> categories = [];
   List<Service> service = [];
   bool team = false;
@@ -27,7 +28,7 @@ class Salon {
   int? prix;
   int? remise;
 
-  Salon(this.nom, this.wilaya,this.prix, this.remise,this.hours,this.teams,this.promo,this.rate,this.photo, this.id, this.description, this.team,this.latitude, this.longitude,this.location,this.phone,this.commune,this.categories, this.service);
+  Salon(this.nom, this.wilaya,this.prix, this.remise,this.hours,this.pack,this.teams,this.promo,this.rate,this.photo, this.id, this.description, this.team,this.latitude, this.longitude,this.location,this.phone,this.commune,this.categories, this.service);
 
   Salon.fromJson(Map<String, dynamic> json){
     id= json['id'] ?? '';
@@ -45,5 +46,6 @@ class Salon {
     team = json['team'] ??  false;
     remise = json['remise'] ?? 0;
     sex = json["sex"] ?? '';
+    pack = json['pack'] ?? 0;
   }
 }

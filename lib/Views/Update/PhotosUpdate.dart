@@ -141,7 +141,7 @@ class _UpdatePhotosBodyState extends State<UpdatePhotosBody> {
                       final snackBar = SnackBar(
                         elevation: 10,
                         padding: const EdgeInsets.only(left: 10),
-                        backgroundColor: primary,
+                        backgroundColor: primaryLite2,
                         behavior: SnackBarBehavior.floating,
                         content: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

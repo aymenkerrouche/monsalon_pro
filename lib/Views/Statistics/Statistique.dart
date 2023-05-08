@@ -3,7 +3,10 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../Provider/AuthProvider.dart';
 import '../../Provider/StatisticsProvider.dart';
 import '../../Theme/colors.dart';
 
@@ -93,7 +96,8 @@ class _StatisticsState extends State<Statistics> {
                     color: Colors.blueGrey.withOpacity(.1),
                     borderRadius: const BorderRadius.all(Radius.circular(16)),
                   ),
-                  child: Consumer<StatisticsProvider>(
+                  child: Provider.of<AuthProvider>(context,listen: false).mySalon.pack == 3 || Provider.of<AuthProvider>(context,listen: false).mySalon.pack == 0 ?
+                  Consumer<StatisticsProvider>(
                     builder: (context, stat, child) {
                       if(stat.done != true) {
                         return const SizedBox();
@@ -108,6 +112,26 @@ class _StatisticsState extends State<Statistics> {
                           )).toList()
                       );
                     }
+                  ):
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Lottie.asset("assets/animation/upgrade.json",reverse: true),
+                          const Text("Mettez à niveau votre abonnement maintenant !",textAlign: TextAlign.center,style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700,letterSpacing: 0.8),),
+                          const SizedBox(height: 30,),
+                          TextButton(
+                            onPressed:()async {
+                              final Uri tlpn = Uri(scheme: 'tel', path: "05 60 32 59 74",);
+                              await launchUrl(tlpn);
+                            },
+                            child: const Text("05 60 32 59 74",style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700,letterSpacing: 0.8)),
+                          ),
+                          const SizedBox(height: 20,),
+                        ],
+                      )
                   ),
                 ),
                 const SizedBox(height: 20,),
@@ -156,7 +180,6 @@ class StatisticsBody extends StatelessWidget {
   }
 }
 
-
 class StatisticsBodyYear extends StatelessWidget {
   const StatisticsBodyYear({Key? key}) : super(key: key);
   @override
@@ -194,6 +217,7 @@ class StatisticsBodyYear extends StatelessWidget {
     );
   }
 }
+
 
 
 class StatisticsCard extends StatelessWidget {

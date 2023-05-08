@@ -4,16 +4,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:getwidget/components/toast/gf_toast.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
+import '../Services/location_services.dart';
+import '../Widgets/SnaKeBar.dart';
 import '../models/Hours.dart';
 import '../models/Image.dart';
 import '../models/Salon.dart';
 import '../models/Service.dart';
 import '../models/Team.dart';
 import '../utils/wilaya.dart';
-
+import 'package:geocoding/geocoding.dart';
 
 class AuthProvider extends ChangeNotifier {
 
@@ -36,6 +42,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   clearLaCommune(){
+    _laCommune.clear();
+    notifyListeners();
+  }
+
+  clearLaWilaya(){
+    _laWilaya.clear();
     _laCommune.clear();
     notifyListeners();
   }
@@ -76,7 +88,25 @@ class AuthProvider extends ChangeNotifier {
       "commune": mySalon.commune,
       "best": false,
       "promo": false,
-      "phone": mySalon.phone
+      "phone": mySalon.phone,
+      "location":mySalon.location,
+      "longitude":mySalon.longitude,
+      "latitude":mySalon.latitude,
+    });
+    notifyListeners();
+  }
+
+  Future<void> createSalonSansLocation() async {
+    await FirebaseFirestore.instance.collection("salon").doc(FirebaseAuth.instance.currentUser?.uid).update({
+      "sex": mySalon.sex,
+      "nom": mySalon.nom,
+      "description": mySalon.description,
+      "wilaya": mySalon.wilaya,
+      "commune": mySalon.commune,
+      "best": false,
+      "promo": false,
+      "phone": mySalon.phone,
+      "location": "${mySalon.wilaya}, ${mySalon.commune}",
     });
     notifyListeners();
   }
@@ -113,6 +143,9 @@ class AuthProvider extends ChangeNotifier {
           mySalon.id = snapshot.id;
           setlaWilaya(mySalon.wilaya!);
           setlaCommune(mySalon.commune!);
+          if(snapshot.get("latitude") != null && snapshot.get("longitude") != null ){
+            setMarker(LatLng(snapshot.get("latitude"), snapshot.get("longitude")));
+          }
         }
       });
       Timer(const Duration(seconds: 1),(){
@@ -126,15 +159,7 @@ class AuthProvider extends ChangeNotifier {
     Timer(const Duration(seconds: 5),(){
       if(done == false) {
         done = true;
-        const snackBar = SnackBar(
-          elevation: 10,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-          behavior: SnackBarBehavior.floating,
-          content: Text(
-              'Internet Connection Problem',
-            style: TextStyle(color: Colors.white),
-          ),
-        );
+        final snackBar = snaKeBar('Internet Connection Problem',);
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         notifyListeners();
       }
@@ -388,14 +413,7 @@ class AuthProvider extends ChangeNotifier {
       });
     }
     catch(e){
-      final snackBar = SnackBar(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          e.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(e.toString(),);
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       debugPrint(e.toString());
     }
@@ -551,6 +569,55 @@ class AuthProvider extends ChangeNotifier {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+  // MAPS
+  Set<Marker> markers = {};
+  CameraPosition myLocation = const CameraPosition(target: LatLng(36.733912777395226, 3.076068641419994), zoom: 14.4746,);
+
+  changeLocation(nowLocation){
+    myLocation = CameraPosition(target: LatLng(nowLocation.latitude!, nowLocation.longitude!), zoom: 14.5,);
+    notifyListeners();
+  }
+
+  Future<void> setMarker(LatLng currentLocation) async {
+    markers.clear();
+    List<Placemark> placemarks = await placemarkFromCoordinates(currentLocation.latitude, currentLocation.longitude);
+    BitmapDescriptor markIcon = BitmapDescriptor.defaultMarkerWithHue(20);
+    Marker newMarker = Marker(
+      markerId: const MarkerId("1"),
+      position: currentLocation,
+      infoWindow: InfoWindow(
+        title: "${placemarks.first.street}, ${placemarks.first.administrativeArea}, ${placemarks.first.country}",
+        snippet: "Lat: ${currentLocation.latitude}, Long: ${currentLocation.longitude}"
+      ),
+      icon: markIcon,
+    );
+    markers.add(newMarker);
+    mySalon.location = "${placemarks.first.street}, ${placemarks.first.administrativeArea}, ${placemarks.first.country} ";
+    mySalon.latitude = currentLocation.latitude;
+    mySalon.longitude = currentLocation.longitude;
+    notifyListeners();
+  }
+
+  Future<void> getMyLocation(context) async {
+    try{
+      LocationData nowLocation = await LocationService().getLocation();
+      changeLocation(nowLocation);
+    }
+    catch(e){
+      GFToast.showToast(e.toString(), context,backgroundColor: Colors.black,toastPosition: GFToastPosition.BOTTOM,toastDuration: 4);
+    }
+  }
 
 
 
