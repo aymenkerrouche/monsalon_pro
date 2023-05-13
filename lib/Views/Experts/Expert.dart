@@ -227,10 +227,10 @@ class _AddExpertState extends State<AddExpert> {
               ),
               const Text( "Ajouter un Expert", style: TextStyle(fontSize: 18, color: Colors.black,fontWeight: FontWeight.w600),textAlign: TextAlign.center,),
               const SizedBox(height: 20,),
-              TextInfomation(textController: expertName,hint:"Entrez le nom de l'expert",label: "Expert",icon: CupertinoIcons.person_alt_circle,textType: TextInputType.text,),
+              TextInfomation(textController: expertName,hint:"Aymen ...",label: "Nom de l'Expert",icon: CupertinoIcons.person_alt_circle,textType: TextInputType.text,),
 
               const SizedBox(height: 15,),
-              !id ? TextInfomation(textController: expertID,hint:"Entrez ID de l'expert",label: "ID",icon: Icons.security_rounded,textType: TextInputType.text,readOnly: id,):
+              !id ? TextInfomation(textController: expertID,hint:"********",label: "ID",icon: Icons.security_rounded,textType: TextInputType.text,readOnly: id,):
               const SizedBox(),
               Row(
                 children: [

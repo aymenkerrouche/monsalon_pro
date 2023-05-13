@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:monsalon_pro/Widgets/SnaKeBar.dart';
 import 'package:monsalon_pro/models/Service.dart';
@@ -53,15 +54,7 @@ class RdvProvider extends ChangeNotifier {
     .catchError((onError){
       debugPrint(onError.toString());
       done = false;
-      final snackBar = SnackBar(
-        elevation: 10,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          onError.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(onError.toString());
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       notifyListeners();
     });
@@ -102,15 +95,7 @@ class RdvProvider extends ChangeNotifier {
     }
     catch(e){
       debugPrint(e.toString());
-      final snackBar = SnackBar(
-        elevation: 10,
-        behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-        content: Text(
-          e.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
     notifyListeners();
@@ -120,14 +105,66 @@ class RdvProvider extends ChangeNotifier {
 
 
 
-  Future<void> getRDV(context,String salonID) async {
+  Future<void> getRDV(context,salonID,chosenValue) async {
     listRDV.clear();
     done = false;
-    await FirebaseFirestore.instance.collection("rdv")
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection("rdv")
         .where("salonID",isEqualTo: salonID)
         .where("etat",isEqualTo: 1)
-        .where("date2", isGreaterThanOrEqualTo: DateTime.now().subtract(const Duration(days: 1))).orderBy("date2")
-    .get().then((snapshot){
+        .where("date2", isGreaterThanOrEqualTo: DateTime.now().subtract(const Duration(days: 1))).orderBy("date2");
+    switch(chosenValue) {
+      case "Tous": {
+        query = await FirebaseFirestore.instance.collection("rdv").where("salonID",isEqualTo: salonID);
+      }
+      break;
+
+      case 'Prochains': {
+        query = FirebaseFirestore.instance.collection("rdv")
+            .where("salonID",isEqualTo: salonID)
+            .where("etat",isEqualTo: 1)
+            .where("date2", isGreaterThanOrEqualTo: DateTime.now().subtract(const Duration(days: 1))).orderBy("date2");
+      }
+      break;
+
+      case 'Terminé': {
+        query = FirebaseFirestore.instance.collection("rdv")
+                .where("salonID",isEqualTo: salonID)
+                .where("etat",isEqualTo: 3)
+                .where("date2", isLessThanOrEqualTo: DateTime.now()).orderBy("date2");
+      }
+      break;
+
+      case 'Annulé': {
+        query = FirebaseFirestore.instance.collection("rdv")
+            .where("salonID",isEqualTo: salonID)
+            .where("etat",whereIn: [2, -1]);
+      }
+      break;
+
+      case 'Récent': {
+        query = FirebaseFirestore.instance.collection("rdv")
+            .where("salonID",isEqualTo: salonID)
+            .orderBy("date2",descending: true);
+      }
+      break;
+
+      case 'Ancien': {
+        query = FirebaseFirestore.instance.collection("rdv")
+            .where("salonID",isEqualTo: salonID)
+            .orderBy("date2");
+      }
+      break;
+
+      default: {
+        query = FirebaseFirestore.instance.collection("rdv")
+            .where("salonID",isEqualTo: salonID)
+            .where("etat",isEqualTo: 1)
+            .where("date2", isGreaterThanOrEqualTo: DateTime.now().subtract(const Duration(days: 1))).orderBy("date2");
+      }
+      break;
+    }
+
+    await query.get().then((snapshot){
       if(snapshot.docs.isNotEmpty){
         for (var element in snapshot.docs) {
           RendezVous rdv = RendezVous.fromJson(element.data());
@@ -145,15 +182,7 @@ class RdvProvider extends ChangeNotifier {
     .catchError((onError){
       debugPrint(onError.toString());
       done = false;
-      final snackBar = SnackBar(
-        elevation: 10,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          onError.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(onError.toString());
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       notifyListeners();
     });
@@ -181,15 +210,7 @@ class RdvProvider extends ChangeNotifier {
       await getUserToken(userID,rdvID,"Nous sommes désolés de vous informer que votre rendez-vous a été annulé.","Rendez-vous annulé");
     }
     catch(onError){
-      final snackBar = SnackBar(
-        elevation: 10,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-        behavior: SnackBarBehavior.floating,
-        content: Text(
-          onError.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(onError.toString());
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       debugPrint(onError.toString());
     }
@@ -206,19 +227,12 @@ class RdvProvider extends ChangeNotifier {
     }
     catch(e){
       debugPrint(e.toString());
-      final snackBar = SnackBar(
-        elevation: 10,
-        behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-        content: Text(
-          e.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+      final snackBar = snaKeBar(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
     notifyListeners();
   }
+
 
 
 
@@ -262,12 +276,6 @@ class RdvProvider extends ChangeNotifier {
       debugPrint('error push notification');
     }
   }
-
-
-
-
-
-
 
 
 

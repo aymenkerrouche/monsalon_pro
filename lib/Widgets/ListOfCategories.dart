@@ -89,17 +89,17 @@ class _ServicesListState extends State<ServicesList> {
             List<Service> lista = v;
             if(lista.isNotEmpty){
               if(provider.mySalon.categories.where((element) => element == widget.category.category).isEmpty){
-                provider.mySalon.categories.add(widget.category.category!);
+                provider.mySalon.categories.add(widget.category.id!);
                 provider.mySalon.service.addAll(lista);
               }
               else{
-                provider.mySalon.service.removeWhere((element) => element.category == widget.category.category);
+                provider.mySalon.service.removeWhere((element) => element.categoryID == widget.category.id);
                 provider.mySalon.service.addAll(lista);
               }
             }
             else{
-              provider.mySalon.categories.removeWhere((element) => element == widget.category.category);
-              provider.mySalon.service.removeWhere((element) => element.category == widget.category.category);
+              provider.mySalon.categories.removeWhere((element) => element == widget.category.id);
+              provider.mySalon.service.removeWhere((element) => element.categoryID == widget.category.id);
             }
             provider.refresh();
           },

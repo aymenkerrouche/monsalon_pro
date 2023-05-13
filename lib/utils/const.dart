@@ -23,7 +23,7 @@ OutlineInputBorder outlineInputBorder() {
 OutlineInputBorder inputBorder() {
   return OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
-      borderSide: BorderSide(color: primary, width: 1.5),
+      borderSide: const BorderSide(color: primary, width: 1.5),
       gapPadding: 6);
 }
 

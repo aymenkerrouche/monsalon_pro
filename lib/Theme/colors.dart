@@ -11,6 +11,7 @@ const Color primaryPro = Color(0xFF21005D);
 const Color primary = Color(0xff6750A4);
 const Color primaryLite2 = Color(0xff785ec2);
 const Color primaryLite =  Color(0xFFEADDFF);
+const Color primaryLite3 =  Color(0xFFF7F1FF);
 const Color clr3 =  Color(0xd86750a4);
 
 const dateColor = ColorScheme.light(

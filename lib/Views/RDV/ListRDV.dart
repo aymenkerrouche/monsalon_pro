@@ -33,7 +33,7 @@ class _LesRendezVousState extends State<LesRendezVous> {
     else{
       salonID = FirebaseAuth.instance.currentUser!.uid;
     }
-    await provider.getRDV(context,salonID).then((value){
+    await provider.getRDV(context,salonID,"Prochains").then((value){
       Timer(const Duration(seconds: 1), () {setState(() {done = true;});});
     })
     .catchError((onError){setState(() {done = true;error = true;});});
@@ -66,10 +66,16 @@ class _LesRendezVousState extends State<LesRendezVous> {
             children: [
               const SizedBox(height: 10,),
               Padding(
-                padding: const EdgeInsets.only(left: 18,top: 10),
-                child: Consumer<RdvProvider>(
-                    builder: (context, rend, child) { return Text("Nombre de rendez-vous: ${rend.listRDV.length}",
-                      style: const TextStyle(color: primaryPro, fontWeight: FontWeight.w700, letterSpacing: 1), maxLines: 3,);}
+                padding: const EdgeInsets.only(left: 18,right: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Consumer<RdvProvider>(
+                        builder: (context, rend, child) { return Text("Nombre de rendez-vous: ${rend.listRDV.length}",
+                          style: const TextStyle(color: primaryPro, fontWeight: FontWeight.w600), maxLines: 3,);}
+                    ),
+                    const DropDownDemo(),
+                  ],
                 ),
               ),
               ListRdv(color:widget.color),
@@ -101,7 +107,7 @@ class ListRdv extends StatelessWidget {
           }
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate(rend.listRDV.length, (index) => RendezVousCard(color:color,rdv: rend.listRDV[index],)),
+            children: List.generate(rend.listRDV.length, (index) => RendezVousCard(color:rend.listRDV[index].etat == 2 || rend.listRDV[index].etat == -1 ? Colors.pink :  rend.listRDV[index].etat == 3 ? primary : rend.listRDV[index].etat == 0 ? Colors.blue.shade700 : color,rdv: rend.listRDV[index],)),
           );
         }
     );
@@ -170,7 +176,7 @@ class RendezVousCard extends StatelessWidget {
                   side: BorderSide.none,
                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
                   padding: EdgeInsets.zero,
-                  label: Text("Accepté",style: TextStyle(fontWeight: FontWeight.w700,color: color,fontSize: 14),),
+                  label: Text(rdv.etat == 2 ? "Annulé"  : rdv.etat == -1 ? "Refusé" : rdv.etat == 3 ? "Terminé" : rdv.etat == 0 ? "En attente" : "Accepté",style: TextStyle(fontWeight: FontWeight.w600,color: color,),),
                   backgroundColor: color.withOpacity(.1),),
               ],
             ),
@@ -180,6 +186,62 @@ class RendezVousCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+
+
+class DropDownDemo extends StatefulWidget {
+  const DropDownDemo({super.key});
+
+  @override
+  _DropDownDemoState createState() => _DropDownDemoState();
+}
+
+class _DropDownDemoState extends State<DropDownDemo> {
+  String chosenValue = "Prochains";
+  String salonID = '';
+  @override
+  void initState() {
+    if(prefs?.getBool("expertMode") == true){
+      salonID = Provider.of<UserProvider>(context,listen: false).expert.team!.salonID!;
+    }
+    else{
+      salonID = FirebaseAuth.instance.currentUser!.uid;
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final prv = Provider.of<RdvProvider>(context,listen: false);
+    return DropdownButton<String>(
+      value: chosenValue,
+      dropdownColor: background,
+      icon: const Icon(Icons.arrow_drop_down_rounded,color: Colors.teal,),
+      underline: const SizedBox(),
+      items: <String>[
+        'Tous',
+        'Prochains',
+        'Terminé',
+        'Annulé',
+        "Récent",
+        "Ancien"
+      ].map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          enabled: chosenValue == value ? false:true,
+          child: Text(value,style: TextStyle(color: chosenValue == value ? Colors.teal : Colors.black, fontWeight: FontWeight.w600)),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          chosenValue = value!;
+        });
+        prv.getRDV(context,salonID,chosenValue);
+      },
     );
   }
 }

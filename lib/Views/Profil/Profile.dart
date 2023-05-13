@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:monsalon_pro/Theme/colors.dart';
 import 'package:monsalon_pro/Views/Experts/Expert.dart';
 import 'package:monsalon_pro/Views/Update/HoursUpdate.dart';
@@ -104,7 +105,13 @@ class _ProfileState extends State<Profile> {
               ProfileMenu(
                 text: "Position GPS",
                 icon: "assets/icons/location.svg",
-                press: ()=> Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => MapScreen(isUpdate: true,)),)),
+                press: () {
+                  final prv = Provider.of<AuthProvider>(context,listen: false);
+                  if(prv.mySalon.latitude != null && prv.mySalon.latitude != 0 ){
+                    prv.changeLocation(LatLng(prv.mySalon.latitude!, prv.mySalon.longitude!));
+                  }
+                  Timer(const Duration(milliseconds: 150), () => Navigator.push(context, CupertinoPageRoute(builder: (context) => MapScreen(isUpdate: true,)),));
+                },
                 primary: primary,
                 secondary: clr3,
               ),

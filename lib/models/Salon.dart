@@ -1,5 +1,8 @@
 // ignore_for_file: file_names
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:monsalon_pro/models/Service.dart';
 import 'Category.dart';
 import 'Hours.dart';
@@ -27,8 +30,9 @@ class Salon {
   List<Team> teams = [];
   int? prix;
   int? remise;
+  Timestamp? createdAt;
 
-  Salon(this.nom, this.wilaya,this.prix, this.remise,this.hours,this.pack,this.teams,this.promo,this.rate,this.photo, this.id, this.description, this.team,this.latitude, this.longitude,this.location,this.phone,this.commune,this.categories, this.service);
+  Salon(this.nom, this.wilaya,this.prix,this.remise,this.hours,this.pack,this.teams,this.promo,this.rate,this.photo, this.id, this.description, this.team,this.latitude, this.longitude,this.location,this.phone,this.commune,this.categories, this.service);
 
   Salon.fromJson(Map<String, dynamic> json){
     id= json['id'] ?? '';
@@ -47,5 +51,6 @@ class Salon {
     remise = json['remise'] ?? 0;
     sex = json["sex"] ?? '';
     pack = json['pack'] ?? 0;
+    createdAt = json["createdAt"] ?? FirebaseAuth.instance.currentUser?.metadata.creationTime;
   }
 }

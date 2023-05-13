@@ -88,17 +88,23 @@ class MapScreen extends StatelessWidget {
                           GFToast.showToast("Placer le marqueur à l'emplacement du salon", context,backgroundColor: Colors.black,toastPosition: GFToastPosition.BOTTOM,toastDuration: 4);
                         }
                         else{
-                          final provider = Provider.of<CategoriesProvider>(context,listen: false);
-                          try{
-                            await maps.createSalon().then((value) async {
-                              await provider.getCategories()
-                                  .then((value) async => await provider.getServices()
-                                  .then((v) => Navigator.push(context, MaterialPageRoute(builder: (context) => ChooseCategories()),)));
-                            });
+                          if(isUpdate){
+                            maps.updateSalonLocation(context);
                           }
-                          catch(e){
-                            GFToast.showToast(e.toString(), context,backgroundColor: Colors.black,toastPosition: GFToastPosition.BOTTOM,toastDuration: 4);
+                          else{
+                            final provider = Provider.of<CategoriesProvider>(context,listen: false);
+                            try{
+                              await maps.createSalon().then((value) async {
+                                await provider.getCategories()
+                                    .then((value) async => await provider.getServices()
+                                    .then((v) => Navigator.push(context, MaterialPageRoute(builder: (context) => ChooseCategories()),)));
+                              });
+                            }
+                            catch(e){
+                              GFToast.showToast(e.toString(), context,backgroundColor: Colors.black,toastPosition: GFToastPosition.BOTTOM,toastDuration: 4);
+                            }
                           }
+
                         }
 
                       },

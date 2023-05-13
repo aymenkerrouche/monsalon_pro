@@ -11,19 +11,23 @@ import '../models/Statistics.dart';
 
 class StatisticsProvider extends ChangeNotifier {
 
-  late Statistic statistic;
-  late Money ceMoisMoney;
+  Statistic statistic = Statistic.fromJson({});
+  Money ceMoisMoney = Money.fromJson({});
   int currentMonth = 0;
 
   bool done = false;
 
   Future<void> getStatistics(context) async {
     done = false;
-    await FirebaseFirestore.instance.collection("statistics").doc("ZAoUYwsrjqpVXCDbqqRM"/*FirebaseAuth.instance.currentUser?.uid*/).get().then((snapshot){
+    await FirebaseFirestore.instance.collection("statistics").doc(FirebaseAuth.instance.currentUser?.uid).get().then((snapshot) async {
+      statistic = Statistic.fromJson({});
       if(snapshot.exists){
         statistic = Statistic.fromJson(snapshot.data()!);
         var sortedByValueMap = Map.fromEntries(statistic.services.entries.toList()..sort((e1, e2) => e2.value.compareTo(e1.value)));
         statistic.services = sortedByValueMap;
+      }
+      else{
+        await FirebaseFirestore.instance.collection("statistics").doc(FirebaseAuth.instance.currentUser?.uid).set({"vuTotal" : 1});
       }
     })
     .catchError((onError){

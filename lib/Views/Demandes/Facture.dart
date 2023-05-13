@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:monsalon_pro/Widgets/SnaKeBar.dart';
 import 'package:monsalon_pro/models/RendezVous.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../Provider/rdvProvider.dart';
+import '../../Theme/colors.dart';
 import '../../utils/const.dart';
 import '../Home/Home.dart';
 
@@ -18,7 +20,7 @@ class FactureScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: background,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text("Rendez-vous",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,fontSize: 24)),
@@ -47,21 +49,30 @@ class FactureScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
+              Container(
+                width: size.width,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(14)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, 1), // changes position of shadow
+                    ),
+                  ],
+                ),
+                margin: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.symmetric(horizontal:12,vertical: 2),
                 child:ListTile(
                   minVerticalPadding: 15,
                   title: Text("${rdv.user}".toTitleCase(), style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w700,),maxLines: 2,),
-                  subtitle: Text("${rdv.userPhone}", style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w600,),maxLines: 2,),
+                  subtitle:  Text(rdv.userPhone!.isEmpty ? "05 -- -- -- --" : "${rdv.userPhone}", style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w600,),maxLines: 2,),
                   trailing: IconButton(
                     onPressed:() async {
                       if(rdv.userPhone!.isEmpty){
-                        const snackBar = SnackBar(
-                          elevation: 10,
-                          behavior: SnackBarBehavior.floating,
-                          content: Text("le client n'a pas de numéro de téléphone", style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-                        );
+                        final snackBar = snaKeBar("le client n'a pas de numéro de téléphone");
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                       else{
@@ -94,19 +105,31 @@ class FactureScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 15,),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Text("${rdv.date} à ${rdv.hour}h".toTitleCase(), style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w700,),maxLines: 2,),
+              Container(
+                width: size.width,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, 1), // changes position of shadow
+                    ),
+                  ],
+                ),
+                margin: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.symmetric(horizontal:12,vertical: 12),
+                child: Text("${rdv.date} à ${rdv.hour}h".toTitleCase(), style: const TextStyle(fontSize: 17,fontWeight: FontWeight.w700,),maxLines: 2,),
               ),
 
 
               // Expert
-
               if(rdv.team == true)Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 30,),
+                  const SizedBox(height: 15,),
                   SizedBox(
                     height: 20,
                     child: Row(
@@ -117,15 +140,27 @@ class FactureScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15,),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
+                  Container(
+                    width: size.width,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade200,
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset: const Offset(0, 1), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    margin: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.symmetric(horizontal:22,vertical: 12),
                     child: Text("${rdv.teamInfo!.name}".toTitleCase(), style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w700,color: Colors.black),maxLines: 2,),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 35,),
+              const SizedBox(height: 15,),
 
               // SERVICES
               SizedBox(
@@ -138,9 +173,22 @@ class FactureScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 15,),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
+              Container(
+                width: size.width,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(14)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, 1), // changes position of shadow
+                    ),
+                  ],
+                ),
+                margin: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.symmetric(horizontal:12,vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: rdv.services.map((e) =>
@@ -152,7 +200,7 @@ class FactureScreen extends StatelessWidget {
                         children: [
                           Container(
                               alignment: Alignment.topLeft,
-                              constraints: BoxConstraints(maxWidth: size.width * 0.6),
+                              constraints: BoxConstraints(maxWidth: size.width * 0.55),
                               child: Text("${e.service}", style: const TextStyle(fontSize: 15,fontWeight: FontWeight.w700,),maxLines: 2,)),
                           Flexible(
                             child: Text( e.prixFin != 0 ? "${e.prix} - ${e.prixFin} DA" : "${e.prix} DA", style: const TextStyle(fontSize: 15,fontWeight: FontWeight.w600,),maxLines: 1,),
@@ -167,48 +215,72 @@ class FactureScreen extends StatelessWidget {
               const Divider(height: 40,),
 
               // PRIX
+              Text("PRIX", style: TextStyle(fontSize: 16,color: color,fontWeight: FontWeight.bold),),
+
               Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                height: 20,
-                child: Row(
-                  children: [
-                    const Text("Montant", style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.w600),),
-                    const Spacer(),
-                    Text(rdv.prixFin == rdv.prix ? "${rdv.prix} DA" : "${rdv.prix} - ${rdv.prixFin} DA", style: const TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.w600),),
+                width: size.width,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade200,
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, 1), // changes position of shadow
+                    ),
                   ],
                 ),
-              ),
-
-              // REMISE
-              Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                height: 20,
-                child: Row(
+                margin: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.symmetric(horizontal:12,vertical: 12),
+                child: Column(
                   children: [
-                     Text("Remise", style: TextStyle(fontSize: 16,color: Colors.red.shade700,fontWeight: FontWeight.w600),),
-                    const Spacer(),
-                    Text("- ${rdv.remise} DA", style: TextStyle(fontSize: 16,color: Colors.red.shade700,fontWeight: FontWeight.w600),),
-                  ],
-                ),
-              ),
+                    // PRIX
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      height: 20,
+                      child: Row(
+                        children: [
+                          const Text("Montant", style: TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.w600),),
+                          const Spacer(),
+                          Text(rdv.prixFin == rdv.prix ? "${rdv.prix} DA" : "${rdv.prix} - ${rdv.prixFin} DA", style: const TextStyle(fontSize: 16,color: Colors.black,fontWeight: FontWeight.w600),),
+                        ],
+                      ),
+                    ),
 
-              // TOTAL
-              Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                height: 20,
-                child: Row(
-                  children: [
-                    Text("Total", style: TextStyle(fontSize: 16,color: Colors.green.shade600,fontWeight: FontWeight.w700),),
-                    const Spacer(),
-                    Text(rdv.prixFin == rdv.prix ? "${formatPrice(rdv.prix!-rdv.remise!)} DA" : "${formatPrice(rdv.prix!-rdv.remise!)} - ${formatPrice(rdv.prixFin!-rdv.remise!)} DA",
-                      style: TextStyle(fontSize: 16,color: Colors.green.shade600,fontWeight: FontWeight.w700),),
+                    // REMISE
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      height: 20,
+                      child: Row(
+                        children: [
+                          Text("Remise", style: TextStyle(fontSize: 16,color: Colors.red.shade700,fontWeight: FontWeight.w600),),
+                          const Spacer(),
+                          Text("- ${rdv.remise} DA", style: TextStyle(fontSize: 16,color: Colors.red.shade700,fontWeight: FontWeight.w600),),
+                        ],
+                      ),
+                    ),
+
+                    // TOTAL
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      height: 20,
+                      child: Row(
+                        children: [
+                          Text("Total", style: TextStyle(fontSize: 16,color: Colors.teal.shade600,fontWeight: FontWeight.w700),),
+                          const Spacer(),
+                          Text(rdv.prixFin == rdv.prix ? "${formatPrice(rdv.prix!-rdv.remise!)} DA" : "${formatPrice(rdv.prix!-rdv.remise!)} - ${formatPrice(rdv.prixFin!-rdv.remise!)} DA",
+                            style: TextStyle(fontSize: 16,color: Colors.teal.shade600,fontWeight: FontWeight.w700),),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
 
               const SizedBox(height: kToolbarHeight,),
 
-              ElevatedButton(
+              if(rdv.etat == 1 || rdv.etat == 1)ElevatedButton(
                 onPressed: () async {
                   if(createRDV == true){
                     await Provider.of<RdvProvider>(context,listen: false).createRDV(context,rdv.salonID!).then((value){
@@ -262,7 +334,7 @@ class FactureScreen extends StatelessWidget {
 
               const SizedBox(height: 25,),
 
-              if(createRDV == false) OutlinedButton(
+              if(createRDV == false && (rdv.etat == 1 || rdv.etat == 0) ) OutlinedButton(
                 onPressed: (){
                   Timer(const Duration(milliseconds: 200),() async {
                     showDialog<void>(

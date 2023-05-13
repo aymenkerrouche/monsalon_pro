@@ -189,8 +189,7 @@ class AuthProvider extends ChangeNotifier {
           mySalon.hours = hour;
         }
         else{
-          Hours hour = Hours.fromJson({});
-          mySalon.hours = hour;
+          await createHours().then((value) => getHours(salonID));
         }
       });
     }
@@ -220,6 +219,36 @@ class AuthProvider extends ChangeNotifier {
         "days.jeudi": mySalon.hours?.jours["jeudi"]["active"],
         "days.vendredi": mySalon.hours?.jours["vendredi"]["active"],
         "days.samedi": mySalon.hours?.jours["samedi"]["active"],
+      });
+    }
+    catch(e){debugPrint(e.toString());}
+    notifyListeners();
+  }
+
+  Future<void> createHours() async {
+    try{
+      await FirebaseFirestore.instance.collection("hours").doc(FirebaseAuth.instance.currentUser?.uid).set({
+        "dimanche": {"active":false,"start":"00:00","fin":"00:00"},
+        "lundi": {"active":false,"start":"00:00","fin":"00:00"},
+        "mardi": {"active":false,"start":"00:00","fin":"00:00"},
+        "mercredi": {"active":false,"start":"00:00","fin":"00:00"},
+        "jeudi": {"active":false,"start":"00:00","fin":"00:00"},
+        "vendredi": {"active":false,"start":"00:00","fin":"00:00"},
+        "samedi": {"active":false,"start":"00:00","fin":"00:00"},
+      });
+    }
+    catch(e){debugPrint(e.toString());}
+    try{
+      await FirebaseFirestore.instance.collection("salonsSearch").doc(FirebaseAuth.instance.currentUser?.uid).update({
+        "days": {
+          "dimanche": false,
+          "lundi": false,
+          "mardi": false,
+          "mercredi": false,
+          "jeudi": false,
+          "vendredi": false,
+          "samedi": false,
+        },
       });
     }
     catch(e){debugPrint(e.toString());}
@@ -298,7 +327,6 @@ class AuthProvider extends ChangeNotifier {
           }
         }
         if(listTempServices.isEmpty){
-          print("mySalon.service.length");
           await FirebaseFirestore.instance.collection("services").add({
             "category": element.category,
             "categoryID": element.categoryID,
@@ -374,16 +402,64 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+
+  Future<void> deleteSalonCategoriesAndServices(id,categoryID) async {
+
+    mySalon.service.removeWhere((element) => element.id == id);
+
+    listTempServices.removeWhere((element) => element.id == id);
+
+    if(mySalon.service.where((element) => element.category == categoryID).isEmpty){
+      mySalon.categories.removeWhere((element) => element == categoryID);
+    }
+    await FirebaseFirestore.instance.collection("services").doc(id).delete();
+
+    int prixMin = mySalon.service.where((element) => element.prix! > 0).first.prix! ;
+    for (var element in mySalon.service) {
+      if(element.prix! <= prixMin && element.prix != 0){
+        mySalon.prix = element.prix!;
+        prixMin = element.prix!;
+      }
+    }
+
+    if(mySalon.categories.isEmpty){
+      await FirebaseFirestore.instance.collection("salonsSearch").doc(FirebaseAuth.instance.currentUser?.uid).update({
+        "category": FieldValue.delete(),
+        "prix": FieldValue.delete(),
+      });
+    }
+    else{
+      if(mySalon.categories.contains(categoryID)){
+        await FirebaseFirestore.instance.collection("salonsSearch").doc(FirebaseAuth.instance.currentUser?.uid).update({
+          "prix": prixMin,
+        });
+      }
+      else{
+        await FirebaseFirestore.instance.collection("salonsSearch").doc(FirebaseAuth.instance.currentUser?.uid).update({
+          "category": FieldValue.arrayRemove([categoryID]),
+          "prix": prixMin,
+        });
+      }
+    }
+
+    await getSalonCategoriesAndServices(FirebaseAuth.instance.currentUser?.uid);
+
+    notifyListeners();
+  }
+
+
+
+  // REMISE
   Future<void> updateRemise(int remise) async {
     await FirebaseFirestore.instance.collection("salon").doc(FirebaseAuth.instance.currentUser?.uid).update({"remise": remise,"promo": true}).then((value){
-      mySalon.remise = remise ;
+      mySalon.remise = remise;
       mySalon.promo = true;
     });
     notifyListeners();
   }
 
   Future<void> deleteRemise() async {
-    await FirebaseFirestore.instance.collection("salon").doc(FirebaseAuth.instance.currentUser?.uid).update({"remise": FieldValue.delete()}).then((value){
+    await FirebaseFirestore.instance.collection("salon").doc(FirebaseAuth.instance.currentUser?.uid).update({"remise": FieldValue.delete(),"promo": false }).then((value){
       mySalon.remise = 0 ;
       mySalon.promo = false;
     });
@@ -582,7 +658,7 @@ class AuthProvider extends ChangeNotifier {
 
   // MAPS
   Set<Marker> markers = {};
-  CameraPosition myLocation = const CameraPosition(target: LatLng(36.733912777395226, 3.076068641419994), zoom: 14.4746,);
+  CameraPosition myLocation = const CameraPosition(target: LatLng(28.26566, 3.01618), zoom: 20,);
 
   changeLocation(nowLocation){
     myLocation = CameraPosition(target: LatLng(nowLocation.latitude!, nowLocation.longitude!), zoom: 14.5,);
@@ -613,6 +689,19 @@ class AuthProvider extends ChangeNotifier {
     try{
       LocationData nowLocation = await LocationService().getLocation();
       changeLocation(nowLocation);
+    }
+    catch(e){
+      GFToast.showToast(e.toString(), context,backgroundColor: Colors.black,toastPosition: GFToastPosition.BOTTOM,toastDuration: 4);
+    }
+  }
+
+  Future<void> updateSalonLocation(context) async {
+    try{
+      await FirebaseFirestore.instance.collection("salon").doc(FirebaseAuth.instance.currentUser?.uid).update({
+        "location":mySalon.location,
+        "longitude":mySalon.longitude,
+        "latitude":mySalon.latitude,
+      });
     }
     catch(e){
       GFToast.showToast(e.toString(), context,backgroundColor: Colors.black,toastPosition: GFToastPosition.BOTTOM,toastDuration: 4);
