@@ -68,11 +68,11 @@ class FactureScreen extends StatelessWidget {
                 child:ListTile(
                   minVerticalPadding: 15,
                   title: Text("${rdv.user}".toTitleCase(), style: const TextStyle(fontSize: 18,fontWeight: FontWeight.w700,),maxLines: 2,),
-                  subtitle:  Text(rdv.userPhone!.isEmpty ? "05 -- -- -- --" : "${rdv.userPhone}", style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w600,),maxLines: 2,),
+                  subtitle:  Text(rdv.userPhone!.isEmpty ? "Client(e) sans num téléphone" : "${rdv.userPhone}", style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: rdv.userPhone!.isEmpty ? Colors.black45 : Colors.black),maxLines: 2,),
                   trailing: IconButton(
                     onPressed:() async {
                       if(rdv.userPhone!.isEmpty){
-                        final snackBar = snaKeBar("le client n'a pas de numéro de téléphone");
+                        final snackBar = snaKeBar("Client(e) n'a pas de numéro de téléphone");
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                       else{
@@ -280,7 +280,7 @@ class FactureScreen extends StatelessWidget {
 
               const SizedBox(height: kToolbarHeight,),
 
-              if(rdv.etat == 1 || rdv.etat == 1)ElevatedButton(
+              if(rdv.etat == 1 || rdv.etat == 0) ElevatedButton(
                 onPressed: () async {
                   if(createRDV == true){
                     await Provider.of<RdvProvider>(context,listen: false).createRDV(context,rdv.salonID!).then((value){
@@ -291,13 +291,7 @@ class FactureScreen extends StatelessWidget {
                   }
                   else{
                     if(rdv.etat == 1 && DateTime.now().isBefore(rdv.date2!.toDate())){
-                      const snackBar = SnackBar(
-                        elevation: 10,
-                        behavior: SnackBarBehavior.floating,
-                        content: Text("vous ne pouvez pas le terminer avant la date du rendez-vous", style: TextStyle(color: Colors.white),
-                        ),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-                      );
+                      final snackBar = snaKeBar("Vous ne pouvez pas le terminer avant la date du rendez-vous");
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                     else if(rdv.etat == 1){

@@ -362,17 +362,20 @@ class RdvProvider extends ChangeNotifier {
       "userID": "1",
       "userPhone": phone,
     };
-    if (teamController.selectedItem.name != "N'importe qui") {
-      rdvMap["team"] = true;
-      rdvMap["teamInfo"] =  {
-        "name": teamController.selectedItem.name,
-        "userID": teamController.selectedItem.userID,
-      };
+    if(teamController.selectedItem != null){
+      if (teamController.selectedItem.name != "N'importe qui") {
+        rdvMap["team"] = true;
+        rdvMap["teamInfo"] = {
+          "name": teamController.selectedItem.name,
+          "userID": teamController.selectedItem.userID,
+        };
+      }
     }
     else {
       rdvMap["team"] = false;
       rdvMap['teamInfo'] = null;
     }
+    print(rdvMap);
     rdv = RendezVous.fromJson(rdvMap);
     rdvMap["service"] = [];
     for (var element in services) {

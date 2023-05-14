@@ -39,25 +39,26 @@ class _StatisticsState extends State<Statistics> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final prv = Provider.of<AuthProvider>(context,listen: false);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text("Statistiques",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,fontSize: 24)),
+          title: const Text("Statistiques",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,)),
           backgroundColor: primary,
           centerTitle: true,
           leading: IconButton(onPressed: (){Navigator.pop(context);}, icon: const Icon(Icons.arrow_back_rounded,color: Colors.white,)),
           bottom: const TabBar(
             indicatorColor: Colors.white,
             indicatorWeight: 4,
-            labelStyle: TextStyle(fontWeight: FontWeight.w700,fontFamily: "Rubik",fontSize: 16),
+            //labelStyle: TextStyle(fontWeight: FontWeight.w700,fontFamily: "Rubik",fontSize: 16),
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white38,
             tabs: [
+              Tab(text: "TOTAL",),
               Tab(text: "Ce mois-ci",),
-              Tab(text: "Total",),
             ],
           ),
         ),
@@ -69,14 +70,14 @@ class _StatisticsState extends State<Statistics> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20,),
+                const SizedBox(height: 10,),
                 SizedBox(
                   height: size.height * 0.45,
                   width: size.width,
                   child: const TabBarView(
                     children: [
-                      StatisticsBody(),
                       StatisticsBodyYear(),
+                      StatisticsBody(),
                     ],
                   ),
                 ),
@@ -96,7 +97,7 @@ class _StatisticsState extends State<Statistics> {
                     color: Colors.blueGrey.withOpacity(.1),
                     borderRadius: const BorderRadius.all(Radius.circular(16)),
                   ),
-                  child: Provider.of<AuthProvider>(context,listen: false).mySalon.pack == 3 || Provider.of<AuthProvider>(context,listen: false).mySalon.pack == 0 ?
+                  child: prv.mySalon.pack == 3 || prv.mySalon.pack == 1 ?
                   Consumer<StatisticsProvider>(
                     builder: (context, stat, child) {
                       if(stat.done != true) {
@@ -113,25 +114,21 @@ class _StatisticsState extends State<Statistics> {
                       );
                     }
                   ):
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Lottie.asset("assets/animation/upgrade.json",reverse: true),
-                          const Text("Mettez à niveau votre abonnement maintenant !",textAlign: TextAlign.center,style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700,letterSpacing: 0.8),),
-                          const SizedBox(height: 30,),
-                          TextButton(
-                            onPressed:()async {
-                              final Uri tlpn = Uri(scheme: 'tel', path: "05 60 32 59 74",);
-                              await launchUrl(tlpn);
-                            },
-                            child: const Text("05 60 32 59 74",style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700,letterSpacing: 0.8)),
-                          ),
-                          const SizedBox(height: 20,),
-                        ],
-                      )
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Lottie.asset("assets/animation/upgrade.json",reverse: true),
+                      const Text("Mettez à niveau votre abonnement maintenant !",textAlign: TextAlign.center,style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700,letterSpacing: 0.8),),
+                      const SizedBox(height: 20,),
+                      TextButton(
+                        onPressed:()async {
+                          final Uri tlpn = Uri(scheme: 'tel', path: "05 60 32 59 74",);
+                          await launchUrl(tlpn);
+                        },
+                        child: const Text("05 60 32 59 74",style: TextStyle(fontSize: 22,fontWeight: FontWeight.w700,letterSpacing: 0.8)),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 20,),
@@ -157,24 +154,72 @@ class StatisticsBody extends StatelessWidget {
           if(stat.done != true) {
             return const Center(child: CircularProgressIndicator(color: primary, strokeWidth: 3,));
           }
-          return GridView.count(
+          return GridView.builder(
             controller: ScrollController(keepScrollOffset: false),
-            crossAxisCount: 2,
-            crossAxisSpacing: size.width * 0.06,
-            mainAxisSpacing: size.width * 0.03,
-            childAspectRatio: 1.5,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: size.width * 0.06,
+              mainAxisSpacing: size.width * 0.03,
+              childAspectRatio: 1.5,
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 15),
-            children: [
-              StatisticsCard(icon:CupertinoIcons.calendar_today, text:"Rendez-vous", color: clr3,onTap: (){},number: stat.statistic.rdv,),
-              StatisticsCard(icon:CupertinoIcons.checkmark_circle, text:"Rendez-vous acceptés",color: Colors.brown.shade900,onTap: (){},number: stat.statistic.rdvDone,),
-
-              StatisticsCard(icon:CupertinoIcons.eye, text:"Vues",color: Colors.blue.shade800, onTap: (){},number: stat.statistic.vue,),
-              StatisticsCard(icon:CupertinoIcons.clear, text:"Rendez-vous annulés",color: pink, onTap: (){},number: stat.statistic.rdv! - stat.statistic.rdvDone!,),
-
-              StatisticsCard(icon:CupertinoIcons.phone, text:"appels",color: Colors.green.shade900, onTap: (){},number: stat.statistic.tlpn,),
-              StatisticsCard(icon:Icons.location_on_outlined, text:"Maps",color: Colors.yellow.shade900, onTap: (){},number: stat.statistic.maps,),
-            ]
+            itemCount: 6,
+            itemBuilder: (BuildContext context, int index) {
+              switch (index) {
+                case 0:
+                  return StatisticsCard(
+                    icon: CupertinoIcons.calendar_today,
+                    text: "Rendez-vous",
+                    color: clr3,
+                    onTap: () {},
+                    number: stat.statistic.rdv,
+                  );
+                case 1:
+                  return StatisticsCard(
+                    icon: CupertinoIcons.checkmark_circle,
+                    text: "Rendez-vous acceptés",
+                    color: Colors.teal.shade900,
+                    onTap: () {},
+                    number: stat.statistic.rdvDone,
+                  );
+                case 2:
+                  return StatisticsCard(
+                    icon: CupertinoIcons.eye,
+                    text: "Vues",
+                    color: Colors.indigoAccent,
+                    onTap: () {},
+                    number: stat.statistic.vue,
+                  );
+                case 3:
+                  return StatisticsCard(
+                    icon: CupertinoIcons.clear,
+                    text: "Rendez-vous annulés",
+                    color: pink,
+                    onTap: () {},
+                    number: stat.statistic.rdv! - stat.statistic.rdvDone!,
+                  );
+                case 4:
+                  return StatisticsCard(
+                    icon: CupertinoIcons.phone,
+                    text: "appels",
+                    color: Colors.green.shade900,
+                    onTap: () {},
+                    number: stat.statistic.tlpn,
+                  );
+                case 5:
+                  return StatisticsCard(
+                    icon: Icons.location_on_outlined,
+                    text: "Maps",
+                    color: Colors.yellow.shade900,
+                    onTap: () {},
+                    number: stat.statistic.maps,
+                  );
+                default:
+                  return const SizedBox();
+              }
+            },
           );
+
         }
     );
   }
@@ -193,23 +238,78 @@ class StatisticsBodyYear extends StatelessWidget {
         return StreamBuilder<Object>(
           stream: null,
           builder: (context, snapshot) {
-            return GridView.count(
-                controller: ScrollController(keepScrollOffset: false),
+            return GridView.builder(
+              controller: ScrollController(keepScrollOffset: false),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: size.width * 0.06,
                 mainAxisSpacing: size.width * 0.03,
                 childAspectRatio: 1.5,
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                children: [
-                  StatisticsCard(icon:CupertinoIcons.calendar_today, text:"Rendez-vous", color: clr3,onTap: (){}, number: stat.statistic.rdvTotal,),
-                  StatisticsCard(icon:CupertinoIcons.checkmark_circle, text:"Rendez-vous acceptés",color: Colors.brown.shade900,onTap: (){},number: stat.statistic.rdvDoneTotal,),
-
-                  StatisticsCard(icon:CupertinoIcons.eye, text:"Vues",color: Colors.blue.shade800, onTap: (){},number: stat.statistic.vueTotal,),
-                  StatisticsCard(icon:CupertinoIcons.phone, text:"appels",color: Colors.green.shade900, onTap: (){},number: stat.statistic.tlpnTotal,),
-
-                  StatisticsCard(icon:Icons.location_on_outlined, text:"Maps",color: Colors.yellow.shade900, onTap: (){},number: stat.statistic.mapsTotal,),
-                  StatisticsCard(icon:CupertinoIcons.clear, text:"Rendez-vous annulés",color: pink, onTap: (){},number: stat.statistic.rdvTotal! - stat.statistic.rdvDoneTotal!,),
-                ]
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              itemCount: 7,
+              itemBuilder: (BuildContext context, int index) {
+                switch (index) {
+                  case 0:
+                    return StatisticsCard(
+                      icon: CupertinoIcons.calendar_today,
+                      text: "Rendez-vous",
+                      color: clr3,
+                      onTap: () {},
+                      number: stat.statistic.rdvTotal,
+                    );
+                  case 1:
+                    return StatisticsCard(
+                      icon: CupertinoIcons.checkmark_circle,
+                      text: "Rendez-vous acceptés",
+                      color: Colors.teal.shade900,
+                      onTap: () {},
+                      number: stat.statistic.rdvDoneTotal,
+                    );
+                  case 2:
+                    return StatisticsCard(
+                      icon: CupertinoIcons.eye,
+                      text: "Vues",
+                      color: Colors.indigoAccent,
+                      onTap: () {},
+                      number: stat.statistic.vueTotal,
+                    );
+                  case 3:
+                    return StatisticsCard(
+                      icon: CupertinoIcons.clear,
+                      text: "Rendez-vous annulés",
+                      color: pink,
+                      onTap: () {},
+                      number: stat.statistic.rdvTotal! - stat.statistic.rdvDoneTotal!,
+                    );
+                  case 4:
+                    return StatisticsCard(
+                      icon: CupertinoIcons.phone,
+                      text: "appels",
+                      color: Colors.green.shade900,
+                      onTap: () {},
+                      number: stat.statistic.tlpnTotal,
+                    );
+                  case 5:
+                    return StatisticsCard(
+                      icon: Icons.location_on_outlined,
+                      text: "Maps",
+                      color: Colors.yellow.shade900,
+                      onTap: () {},
+                      number: stat.statistic.mapsTotal,
+                    );
+                  case 6:
+                    return StatisticsCard(
+                      icon: CupertinoIcons.bookmark_fill,
+                      text: "Favorites",
+                      color: Colors.black45,
+                      onTap: () {},
+                      number: stat.statistic.favorites,
+                    );
+                  default:
+                    return const SizedBox();
+                }
+              },
             );
           }
         );

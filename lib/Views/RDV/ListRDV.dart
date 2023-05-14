@@ -20,6 +20,7 @@ class LesRendezVous extends StatefulWidget {
   @override
   State<LesRendezVous> createState() => _LesRendezVousState();
 }
+
 class _LesRendezVousState extends State<LesRendezVous> {
   bool done = false;
   bool error = false;
@@ -143,7 +144,7 @@ class RendezVousCard extends StatelessWidget {
           splashColor: color.withOpacity(.6),
           borderRadius: const BorderRadius.all(Radius.circular(14)),
           child: ListTile(
-            minVerticalPadding: 15,
+            minVerticalPadding: 8,
             title: Text("${rdv.user}".toTitleCase(),style: const TextStyle(fontWeight: FontWeight.w700,fontSize: 18),),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,13 +192,11 @@ class RendezVousCard extends StatelessWidget {
 }
 
 
-
-
 class DropDownDemo extends StatefulWidget {
-  const DropDownDemo({super.key});
+  const DropDownDemo({Key? key}) : super(key: key);
 
   @override
-  _DropDownDemoState createState() => _DropDownDemoState();
+  State<DropDownDemo> createState() => _DropDownDemoState();
 }
 
 class _DropDownDemoState extends State<DropDownDemo> {

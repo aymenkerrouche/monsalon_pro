@@ -10,6 +10,7 @@ import 'package:getwidget/position/gf_toast_position.dart';
 import 'package:monsalon_pro/Provider/UserProvider.dart';
 import 'package:provider/provider.dart';
 import '../../../Theme/colors.dart';
+import '../../../Widgets/SnaKeBar.dart';
 import '../../../utils/const.dart';
 import '../../Home/Home.dart';
 import 'package:monsalon_pro/models/User.dart' as us;
@@ -190,12 +191,7 @@ class UpdateProfileFormState extends State<UpdateProfileForm> {
             Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (BuildContext context) => const HomePage()), (Route<dynamic> route) => false);
           }
           else{
-            const snackBar = SnackBar(
-              elevation: 10,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-              content: Text("Mise à jour du profil réussie", style: TextStyle(color: Colors.white),),
-            );
+            final snackBar = snaKeBar("Mise à jour du profil réussie");
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
         });

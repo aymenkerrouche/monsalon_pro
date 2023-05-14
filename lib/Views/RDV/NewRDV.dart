@@ -14,6 +14,7 @@ import '../../Provider/AuthProvider.dart';
 import '../../Provider/UserProvider.dart';
 import '../../Provider/rdvProvider.dart';
 import '../../Theme/colors.dart';
+import '../../Widgets/SnaKeBar.dart';
 import '../../Widgets/keyboard.dart';
 import '../../Widgets/phone TextField.dart';
 import '../../main.dart';
@@ -105,6 +106,7 @@ class _CreateRdvBodyState extends State<CreateRdvBody> {
   bool click = false;
   bool tlpn = false;
 
+
   @override
   void dispose() {
     name.dispose();
@@ -133,12 +135,12 @@ class _CreateRdvBodyState extends State<CreateRdvBody> {
             ),
           ),
           const SizedBox(height: 20,),
-          TextInfomation(textController: name,hint:"le nom",label: "Nom",icon: CupertinoIcons.person_alt_circle,textType: TextInputType.text),
+          TextInfomation(textController: name,hint:"Aymen",label: "Nom",icon: CupertinoIcons.person,textType: TextInputType.text),
 
           Column(
             children: [
               if(!tlpn) const SizedBox(height: 20,),
-              if(!tlpn) TextInfomation(textController: phone,hint:"05 .. .. ..",label: "Téléphone",icon: CupertinoIcons.phone,textType: TextInputType.phone),
+              if(!tlpn) TextInfomation(textController: phone,hint:"05 -- -- -- --",label: "Téléphone",icon: CupertinoIcons.phone,textType: TextInputType.phone),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 width: size.width,
@@ -193,14 +195,33 @@ class _CreateRdvBodyState extends State<CreateRdvBody> {
           // BOOK
           ElevatedButton(
             onPressed:() async {
-              final provider2 = Provider.of<RdvProvider>(context,listen: false);
-              setState((){click = true;});
-              if (serviceController.selectedItem.isNotEmpty) {
-                provider2.fillRDV( provider.mySalon, phone.text, name.text, serviceController.selectedItem, teamController)
-                    .then((value) => Timer(const Duration(milliseconds: 200),()=>
-                    Navigator.push(context, CupertinoPageRoute(builder: (context) => FactureScreen(rdv: provider2.rdv!, color: primaryLite2,createRDV: true,)),)));
+              if(name.text.isEmpty){
+                final snackBar = snaKeBar("Le nom du client(e) est requis");
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
               }
-              setState((){click = false;});
+              else{
+                if(serviceController.selectedItem.isEmpty || serviceController.selectedItem == null){
+                  final snackBar = snaKeBar("Veuillez sélectionner un ou plusieurs services");
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+                else{
+                  final provider2 = Provider.of<RdvProvider>(context,listen: false);
+                  if(provider2.selectedHour == '' || provider2.selectedDay == 'Selectionnez une date'){
+                    final snackBar = snaKeBar("Veuillez sélectionner une date et une heure");
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
+                  else{
+                    setState((){click = true;});
+                    if (serviceController.selectedItem.isNotEmpty) {
+                      provider2.fillRDV( provider.mySalon, phone.text, name.text, serviceController.selectedItem, teamController)
+                          .then((value) => Timer(const Duration(milliseconds: 200),()=>
+                          Navigator.push(context, CupertinoPageRoute(builder: (context) => FactureScreen(rdv: provider2.rdv!, color: primaryLite2,createRDV: true,)),)));
+                    }
+                    setState((){click = false;});
+                  }
+
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryLite2,
@@ -256,7 +277,7 @@ class _CreateRdvBodyState extends State<CreateRdvBody> {
               itemTitleStyle: const TextStyle(fontSize: 16),
               groupTitleStyle: const TextStyle(fontSize: 20,fontWeight: FontWeight.w600,color: Colors.black,),
             ),
-            checkFirstElement: true,
+            checkFirstElement: false,
           ),
         ),
 

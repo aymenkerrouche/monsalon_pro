@@ -10,6 +10,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../../Provider/AuthProvider.dart';
 import '../../Theme/colors.dart';
+import '../../Widgets/SnaKeBar.dart';
 import '../../Widgets/keyboard.dart';
 import '../../models/Image.dart';
 
@@ -159,15 +160,7 @@ class _UpdatePhotosBodyState extends State<UpdatePhotosBody> {
                       Navigator.pop(context);})
                     .catchError((onError){
                       setState(() {next = false;});
-                      final snackBar = SnackBar(
-                        elevation: 10,
-                        backgroundColor: Colors.red.shade700,
-                        behavior: SnackBarBehavior.floating,
-                        content: Text(
-                          onError.toString(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
+                      final snackBar = snaKeBar(onError.toString());
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     });
                     setState(() {next = false;});

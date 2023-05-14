@@ -9,6 +9,7 @@ import 'package:monsalon_pro/utils/const.dart';
 import 'package:provider/provider.dart';
 import '../../Provider/AuthProvider.dart';
 import '../../Theme/colors.dart';
+import '../../Widgets/SnaKeBar.dart';
 
 class UpdateHours extends StatelessWidget {
   const UpdateHours({Key? key}) : super(key: key);
@@ -113,15 +114,7 @@ class _UpdateHoursBodyState extends State<UpdateHoursBody> {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     Navigator.pop(context);})
                       .catchError((onError){
-                    final snackBar = SnackBar(
-                      elevation: 10,
-                      backgroundColor: Colors.red.shade700,
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        onError.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    );
+                    final snackBar = snaKeBar(onError.toString());
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   });
                 },

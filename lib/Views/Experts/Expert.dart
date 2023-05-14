@@ -276,25 +276,11 @@ class _AddExpertState extends State<AddExpert> {
                   KeyboardUtil.hideKeyboard(context);
                   final provider = Provider.of<AuthProvider>(context,listen: false);
                   if(expertName.text.isEmpty  && id == true ){
-                    const snackBar = SnackBar(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        "Ajouter le nom de l'Expert",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
+                    final snackBar = snaKeBar("Ajouter le nom de l'Expert");
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                   else if(expertID.text.isEmpty && id == false){
-                    const snackBar = SnackBar(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                      behavior: SnackBarBehavior.floating,
-                      content: Text(
-                        "Ajouter l' ID de l'Expert",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
+                    final snackBar = snaKeBar("Ajouter l' ID de l'Expert");
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                   }
                   else{
@@ -311,15 +297,7 @@ class _AddExpertState extends State<AddExpert> {
                         await Provider.of<AuthProvider>(context,listen: false).ajouterExperts(newTeam).then((value) => Navigator.pop(context));
                       }
                       catch(e){
-                        final snackBar = SnackBar(
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-                          behavior: SnackBarBehavior.floating,
-                          content: Text(
-                            e.toString(),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-
+                        final snackBar = snaKeBar(e.toString());
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     }

@@ -30,7 +30,6 @@ import '../Demandes/Demandes.dart';
 import '../Money/Money.dart';
 import '../RDV/ListRDV.dart';
 import '../RDV/NewRDV.dart';
-import '../Update/HoursUpdate.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -110,7 +109,6 @@ class HomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<AuthProvider>(context,listen: false);
     return Container(
       padding: const EdgeInsets.only(top: 20,left: 5,right: 5),
       child: Column(
@@ -119,34 +117,35 @@ class HomeBody extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 8),
             color: primary,
             child: InkWell(
-              onTap: () => showUpgrade(context),
+              onTap: ()=> showUpgrade(context),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal:8.0,vertical: 6),
                 child: SizedBox(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                      Consumer<AuthProvider>(
+                        builder: (context, provider, child){
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(width: 10,),
-                              const Text("Abonnement : ",style: TextStyle(color: Colors.white),),
-                              Text( provider.mySalon.pack == 0 ? "Mode d'essai" : provider.mySalon.pack == 1 ? "Basic" : provider.mySalon.pack == 2 ? "Silver" : provider.mySalon.pack ==3 ? "Gold" : "Non défini, contactez-nous",
-                                style: const TextStyle(fontSize: 20,fontWeight: FontWeight.w600,color: Colors.white),
+                              Row(
+                                children: [
+                                  const SizedBox(width: 10,),
+                                  const Text("Abonnement : ",style: TextStyle(color: Colors.white),),
+                                  Text( provider.mySalon.pack == 0 ? "Mode d'essai" : provider.mySalon.pack == 1 ? "Basic" : provider.mySalon.pack == 2 ? "Silver" : provider.mySalon.pack ==3 ? "Gold" : "Non défini, contactez-nous", style: const TextStyle(fontSize: 20,fontWeight: FontWeight.w600,color: Colors.white),),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const SizedBox(width: 10,),
+                                  const Text("Jusqu'au : ",style: TextStyle(color: Colors.white),),
+                                  if(provider.mySalon.createdAt != null) Text(" ${weekdayName[Jiffy(provider.mySalon.createdAt!.toDate()).day]} ${DateFormat("dd-MM-yyyy").format(Jiffy(provider.mySalon.createdAt!.toDate()).add(months: 6).dateTime)}".toTitleCase(),style: const TextStyle(fontWeight: FontWeight.w600,color: Colors.white),),
+                                ],
                               ),
                             ],
-                          ),
-                          Row(
-                            children: [
-                              const SizedBox(width: 10,),
-                              const Text("Jusqu'au : ",style: TextStyle(color: Colors.white),),
-                              Text(" ${weekdayName[Jiffy(provider.mySalon.createdAt!.toDate()).day]} ${DateFormat("dd-MM-yyyy").format(Jiffy(provider.mySalon.createdAt!.toDate()).add(months: 6).dateTime)}".toTitleCase(),style: const TextStyle(fontWeight: FontWeight.w600,color: Colors.white),),
-                            ],
-                          ),
-
-                        ],
+                          );
+                        },
                       ),
                       Lottie.asset("assets/animation/upgrade.json",height: 60,reverse: true,repeat: true)
                     ],
@@ -157,50 +156,53 @@ class HomeBody extends StatelessWidget {
           ),
           const SizedBox(height: 10,),
           Expanded(
-            child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                children: [
-                  DashboardCard(
-                    icon:CupertinoIcons.chart_pie,
-                    text:"Statistiques",
-                    color: clr3,
-                    photo: "assets/icons/chart.png",
-                    onTap: () {
-                      if(provider.mySalon.pack == 3 || provider.mySalon.pack == 0 || provider.mySalon.pack == 2){
-                        Timer(const Duration(milliseconds: 150), () => Navigator.push(context, CupertinoPageRoute(builder: (context) => const Statistics()),));
-                      }
-                      else{
-                        showUpgrade(context);
-                      }
+            child: Consumer<AuthProvider>(builder: (context, provider, child){
+              return GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  children: [
+                    DashboardCard(
+                      icon:CupertinoIcons.chart_pie,
+                      text:"Statistiques",
+                      color: clr3,
+                      photo: "assets/icons/chart.png",
+                      onTap: () {
+                        if(provider.mySalon.pack == 3 || provider.mySalon.pack == 0 || provider.mySalon.pack == 2){
+                          Timer(const Duration(milliseconds: 150), () => Navigator.push(context, CupertinoPageRoute(builder: (context) => const Statistics()),));
+                        }
+                        else{
+                          showUpgrade(context);
+                        }
                       },
-                  ),
-                  DashboardCard(icon:CupertinoIcons.creditcard, text:"Revenus",color: Colors.cyan,photo: "assets/icons/money.png",onTap: () {
-                    if(provider.mySalon.pack == 3 || provider.mySalon.pack == 0){
-                      Timer(const Duration(milliseconds: 150), () => Navigator.push(context, CupertinoPageRoute(builder: (context) => MoneyScreen(color: Colors.cyan.shade800,)),));
-                    }
-                    else{
-                      showUpgrade(context);
-                    }
-
-                  }),
-
-                  DashboardCard(icon:CupertinoIcons.calendar_today, text:"Rendez-vous",color: Colors.teal.shade500 ,photo: "assets/icons/add.png",onTap: ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => LesRendezVous(color: Colors.teal.shade500,)),)),),
-                  DashboardCard(icon:CupertinoIcons.list_bullet, text:"Les demandes",color: Colors.pink.shade700 ,photo: "assets/icons/inbox.png",onTap: ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) =>  LesDemandes(color: Colors.pink.shade700,)),)),),
-
-                  DashboardCard(icon:CupertinoIcons.rectangle_stack_person_crop, text:"Profil",color: Colors.blue.shade800,photo: "assets/icons/user.png",onTap:  ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) =>  const Profile(),),)),),
-                  DashboardCard(icon:CupertinoIcons.add, text:"Nouveau RDV",color: Colors.lightGreen.shade900,photo: "assets/icons/nv.png",onTap:(){
-                    {
-                      if(provider.mySalon.pack == 3 || provider.mySalon.pack == 0 || provider.mySalon.pack == 2){
-                        Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => const CreateRdv()),));
+                    ),
+                    DashboardCard(icon:CupertinoIcons.creditcard, text:"Revenus",color: Colors.cyan,photo: "assets/icons/money.png",onTap: () {
+                      if(provider.mySalon.pack == 3 || provider.mySalon.pack == 0){
+                        Timer(const Duration(milliseconds: 150), () => Navigator.push(context, CupertinoPageRoute(builder: (context) => MoneyScreen(color: Colors.cyan.shade800,)),));
                       }
                       else{
                         showUpgrade(context);
                       }
-                    }
-                  }),
 
-                ]
+                    }),
+
+                    DashboardCard(icon:CupertinoIcons.calendar_today, text:"Rendez-vous",color: Colors.teal.shade500 ,photo: "assets/icons/add.png",onTap: ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => LesRendezVous(color: Colors.teal.shade500,)),)),),
+                    DashboardCard(icon:CupertinoIcons.list_bullet, text:"Demandes",color: Colors.pink.shade700 ,photo: "assets/icons/inbox.png",onTap: ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) =>  LesDemandes(color: Colors.pink.shade700,)),)),),
+
+                    DashboardCard(icon:CupertinoIcons.rectangle_stack_person_crop, text:"Profil",color: Colors.blue.shade800,photo: "assets/icons/user.png",onTap:  ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) =>  const Profile(),),)),),
+                    DashboardCard(icon:CupertinoIcons.add, text:"Nouveau",color: Colors.lightGreen.shade900,photo: "assets/icons/nv.png",onTap:(){
+                      {
+                        if(provider.mySalon.pack == 3 || provider.mySalon.pack == 0 || provider.mySalon.pack == 2){
+                          Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => const CreateRdv()),));
+                        }
+                        else{
+                          showUpgrade(context);
+                        }
+                      }
+                    }),
+
+                  ]
+              );
+            },
             ),
           ),
         ],
@@ -401,10 +403,10 @@ class HomeBodyExpert extends StatelessWidget {
                   children: [
 
                     DashboardCardExpert(icon:CupertinoIcons.calendar_today, text:"Rendez-vous",color: Colors.teal.shade500 ,photo: "assets/icons/add.png",onTap: ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => LesRendezVous(color: Colors.teal.shade500,)),)),),
-                    DashboardCardExpert(icon:CupertinoIcons.list_bullet, text:"Les demandes",color: Colors.pink.shade700 ,photo: "assets/icons/inbox.png",onTap: ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) =>  LesDemandes(color: Colors.pink.shade700,)),)),),
+                    DashboardCardExpert(icon:CupertinoIcons.list_bullet, text:"Demandes",color: Colors.pink.shade700 ,photo: "assets/icons/inbox.png",onTap: ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) =>  LesDemandes(color: Colors.pink.shade700,)),)),),
 
                     DashboardCardExpert(icon:CupertinoIcons.rectangle_stack_person_crop, text:"Profil",color: Colors.blue.shade800,photo: "assets/icons/user.png",onTap:  ()=>Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) =>  const UpdateProfileScreen(),),)),),
-                    DashboardCardExpert(icon:CupertinoIcons.add, text:"Nouveau RDV",color: Colors.lightGreen.shade900,photo: "assets/icons/nv.png",onTap:(){
+                    DashboardCardExpert(icon:CupertinoIcons.add, text:"Nouveau",color: Colors.lightGreen.shade900,photo: "assets/icons/nv.png",onTap:(){
                       Timer(const Duration(milliseconds: 150),()=>Navigator.push(context, CupertinoPageRoute(builder: (context) => const CreateRdv()),));
                     }),
 

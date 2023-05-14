@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable
 
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -126,6 +125,7 @@ class _UpdateCategoriesState extends State<UpdateCategories> {
                   });
                 }
                 catch(err){
+                  debugPrint(err.toString());
                   setState(() {next = false;});
                   final snackBar = snaKeBar(err.toString(),);
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);}
@@ -423,15 +423,7 @@ class _MyServicesState extends State<MyServices> {
                       onPressed:() async {
                         if(editing == true){
                           if(prxFin == true && int.parse(prixFin.text) < int.parse(prix.text)){
-                            const snackBar = SnackBar(
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-                              behavior: SnackBarBehavior.floating,
-                              content: Text(
-                                'Le deuxième prix doit être plus que le premier',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            );
+                            final snackBar = snaKeBar('Le deuxième prix doit être plus que le premier');
                             ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           }
                           else{
